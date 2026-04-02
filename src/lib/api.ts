@@ -15,7 +15,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${ACCESSTOKEN}`;
   } else {
     delete config.headers.Authorization;
-    throw new Error("No access token found");
   }
 
   return config;

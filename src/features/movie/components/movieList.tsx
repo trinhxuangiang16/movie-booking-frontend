@@ -1,5 +1,4 @@
 "use client";
-
 import { useMovies } from "../hooks/useMovies";
 
 export default function MovieList() {

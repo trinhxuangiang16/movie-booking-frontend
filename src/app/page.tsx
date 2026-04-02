@@ -1,19 +1,14 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import "./globals.css";
-import { Form } from "radix-ui";
+import Banner from "@/components/layout.tsx/Banner";
+
+import { useState } from "react";
+import ModalTopHot from "@/features/movie/index";
+import { THotMovie } from "@/features/movie/types/typeHotMovie";
 
 export default function HomePage() {
   return (
-    <div>
-      <div className="text-red-500 text-2xl">Hello Tailwind</div>
-      <Button>Click me</Button>
-
-      <Button variant="outline">Outline</Button>
-
-      <Button size="sm">Small</Button>
-
-      <Button variant="destructive">Delete</Button>
+    <div className="bg-[#0c1137] h-[4000px] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">
+      <Banner />
     </div>
   );
 }

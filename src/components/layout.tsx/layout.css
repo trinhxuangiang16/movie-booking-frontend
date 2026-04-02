@@ -1,0 +1,309 @@
+/*Header*/
+.header {
+  /* position: absolute; */
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 50px;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-color: transparent;
+  letter-spacing: 1px;
+}
+.header .logo {
+  position: relative;
+  font-size: 32px;
+  /* color: white; */
+  background: linear-gradient(90deg, #ffccf2, #97dde8);
+  padding: 10px 20px;
+
+  font-weight: 700;
+  transition: 0.3s ease;
+  margin-left: 60px;
+  display: flex;
+}
+.header .logo p {
+  z-index: 10;
+}
+.header .logo::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-top: 8px black solid;
+  border-bottom: 8px black solid;
+  background-color: transparent;
+  z-index: 5;
+}
+.header .logo::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 4px);
+  border-top: 4px white dotted;
+  border-bottom: 4px white dotted;
+  background-color: transparent;
+  z-index: 6;
+}
+
+.header .logo:hover {
+  text-shadow:
+    0 0 2px #ffffff,
+    0 0 5px #00f0ff,
+    0 0 10px #00f0ff,
+    0 0 20px #00eeff;
+}
+
+.header .logo div {
+  background-color: #c22f4e;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  width: 32px;
+  height: 80%;
+  text-align: center;
+  rotate: 8deg;
+  border-radius: 8px;
+  font-size: 30px;
+  padding-right: 4px;
+  position: relative;
+  box-shadow:
+    0 0 2px #fffffffc,
+    0 0 5px #ba3f3f,
+    0 0 10px #902727,
+    0 0 20px #842424;
+  letter-spacing: 1px;
+}
+
+.nav a {
+  position: relative !important;
+  margin-left: 25px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 25px;
+  transition: 0.3s ease;
+  padding: 5px 8px !important;
+  border-radius: 10px;
+
+  color: #660e0e;
+  /* border-color: 1px solid rgba(255, 255, 255, 0.764) !important; */
+  filter: drop-shadow(0 0 1px rgba(216, 216, 216, 0.842))
+    drop-shadow(0 0 1px rgba(210, 210, 210, 0.584));
+}
+
+.nav a:hover {
+  color: #ffffff;
+  box-shadow:
+    0 0 5px #bf092f,
+    0 0 10px #bf0930d6,
+    0 0 20px #bf0930bd,
+    0 0 40px #bf093091,
+    0 0 80px #bf093076;
+
+  filter: none;
+}
+
+/*Banner*/
+.banner {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+
+  /* 🎬 cinematic teal look */
+  filter: brightness(0.85) contrast(1.15) saturate(0.85) hue-rotate(-10deg)
+    blur(0.3px);
+
+  background-image:
+    /* dark shadow bottom */
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      transparent 100%
+    ),
+    /* teal cinematic overlay */
+    linear-gradient(
+        to right,
+        rgba(0, 60, 80, 0.6) 0%,
+        rgba(0, 40, 60, 0.4) 40%,
+        transparent 70%
+      ),
+    /* noise texture (film grain) */
+    url("http://www.transparenttextures.com/patterns/clean-gray-paper.png"),
+    /* main image */ var(--banner-url);
+
+  background-size: cover, cover, cover, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* 🎯 blend để ra màu điện ảnh */
+  background-blend-mode: overlay, overlay, soft-light, normal;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  background-position: 50% 0%;
+}
+
+.banner .slide-banner {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 30%;
+}
+
+.banner .slide-banner .swiper-slide {
+  transition: all 0.8s ease !important;
+  opacity: 0.6;
+  filter: blur(2px) !important;
+  transform: scale(0.95);
+  height: 100%;
+}
+
+.banner .slide-banner .swiper-slide-active {
+  border-radius: 15px;
+  filter: blur(0) !important;
+  opacity: 0.9;
+}
+
+.banner .slide-banner .swiper-slide-prev,
+.banner .slide-banner .swiper-slide-next {
+  opacity: 0.85;
+  filter: blur(0);
+}
+
+.banner .banner-content {
+  left: 5%;
+  position: absolute;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  margin-top: 5%;
+  z-index: 22;
+}
+
+.banner .banner-content .banner-title {
+  position: relative !important;
+  background: linear-gradient(90deg, #63eaff, #ffafeb);
+  background-size: cover;
+  background-clip: text;
+  color: transparent;
+  width: fit-content;
+  font-size: 80px;
+  height: 95px;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
+}
+
+.banner .banner-content .banner-description {
+  max-width: 500px;
+  font-size: 22px;
+  position: relative !important;
+  background: linear-gradient(90deg, #ffafeb, #63eaff);
+  background-size: cover;
+  background-clip: text;
+  color: transparent;
+  width: fit-content;
+
+  height: 70px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 10px;
+
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
+}
+
+.banner .banner-title:hover,
+.banner .banner-description:hover {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.842));
+  /* drop-shadow(0 0 6px rgba(151, 255, 250, 0.764)); */
+  /* border-color: 1px solid rgba(0, 0, 0, 0.455); */
+  color: white;
+  /* transform: scale(1.05); */
+}
+
+.banner * {
+  cursor: pointer;
+}
+
+@keyframes animateLogo {
+  to {
+    background-position-x: -1000px;
+  }
+}
+
+.banner .banner-content .banner-button {
+  display: flex;
+  gap: 20px;
+  font-size: 22px;
+}
+
+/* .banner .banner-content .banner-button .grade {
+  display: flex;
+} */
+
+.banner .banner-content .banner-button div {
+  position: relative !important;
+  background: linear-gradient(90deg, #ffafeb, #63eaff);
+  color: black;
+  border-color: transparent;
+  transition: 0.3s ease;
+  border-radius: 5px;
+  width: 60px;
+  height: 40px;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
+}
+
+.banner .banner-content .banner-button div:hover {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+  transform: scale(1.05);
+  color: white;
+}
+
+.banner .banner-content .banner-button .active-danh-gia {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+  transform: scale(1.05);
+  color: white;
+}
+.banner .banner-content .banner-button .grade-banner a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content !important;
+  /* font-size: 22px; */
+  padding: 5px 15px;
+}
+
+.banner .banner-content .banner-button .play-banner {
+  padding: 10px 19px;
+}
+
+.banner .banner-content .banner-button .showtimes {
+  font-size: 26px;
+  width: fit-content !important;
+  background: linear-gradient(90deg, #ffafeb, #63eaff);
+  background-size: cover;
+  color: black;
+  padding: 0px 15px;
+}
+
+.xep-hang,
+.trailer-player {
+  margin: auto 5% auto 45% !important;
+}
