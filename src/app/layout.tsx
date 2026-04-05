@@ -2,8 +2,6 @@
 
 import QueryProviders from "@/providers/query-providers";
 import "./globals.css";
-import { Geist, Oswald } from "next/font/google";
-// import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 
 import Header from "@/components/layout.tsx/Header";

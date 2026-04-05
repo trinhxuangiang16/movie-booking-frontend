@@ -18,3 +18,8 @@
 html {
   scroll-behavior: smooth;
 }
+
+::selection {
+  background: rgba(255, 0, 80, 0.4);
+  color: white;
+}

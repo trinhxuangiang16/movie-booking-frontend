@@ -25,7 +25,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-import { THotMovie } from "../types/typeHotMovie";
+import { TMovie } from "../types/typeMovie";
 import { use, useEffect, useState } from "react";
 import { ChartData } from "recharts/types/state/chartDataSlice";
 
@@ -42,12 +42,10 @@ export function ChartTopHot({
   activeMovie,
   movies,
 }: {
-  movies: THotMovie[];
-  activeMovie: THotMovie | null;
+  movies: TMovie[];
+  activeMovie: TMovie | null;
 }) {
-  const [currentMovie, setCurrentMovie] = useState<THotMovie | null>(
-    activeMovie,
-  );
+  const [currentMovie, setCurrentMovie] = useState<TMovie | null>(activeMovie);
   const [chartData, setChartData] = useState<
     Array<{ hang: number; phim: string; diem: number }>
   >([]);

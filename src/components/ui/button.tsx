@@ -21,6 +21,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         gradient:
           "bg-[linear-gradient(90deg,#ffccf2,#97dde8)] text-black hover:brightness-110",
+        clipButton:
+          "bg-gradient-to-r from-[#63eaff] to-[#ff88e1] bg-clip-text text-transparent",
       },
       size: {
         default:

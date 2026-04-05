@@ -4,7 +4,7 @@ import { bebas } from "@/lib";
 
 function Header() {
   return (
-    <div className="header fixed top-0 w-full z-50 bg-white/5 backdrop-blur-md border-b border-white/10">
+    <div className="header absolute top-0 w-full z-50 bg-white/5 backdrop-blur-md border-b border-white/10">
       <Link href={"/"} className="logo">
         <p className={`${bebas.className}`}>Movi</p>{" "}
         <div className={`${bebas.className} logo-e`}>.E</div>

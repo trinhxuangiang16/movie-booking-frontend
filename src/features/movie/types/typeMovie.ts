@@ -1,4 +1,4 @@
-export type THotMovie = {
+export type TMovie = {
   ma_phim: number;
   ten_phim: string;
   hinh_anh: string;
