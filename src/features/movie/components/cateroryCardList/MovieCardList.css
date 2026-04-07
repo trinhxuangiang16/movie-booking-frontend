@@ -13,7 +13,7 @@
 }
 
 .movie-card-wrap:hover {
-  transform: scaleX(1.5);
+  transform: scaleX(1.4);
   margin-top: 30px;
   margin-left: 20px;
   z-index: 50;
@@ -24,7 +24,7 @@
 .movie-card-wrap::before {
   content: "";
   position: absolute;
-  inset: -40px;
+  inset: -48px;
 }
 
 .movie-card-bg {
@@ -115,7 +115,7 @@
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.829);
+  color: rgba(0, 0, 0, 0.922);
   font-weight: 700;
   text-transform: uppercase;
   background-color: rgb(255, 234, 0);

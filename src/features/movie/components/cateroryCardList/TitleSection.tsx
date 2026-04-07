@@ -1,10 +1,10 @@
-import "./TitleList.css";
+import "./TitleSection.css";
 import { oswald } from "@/lib";
 import CircleRadiusBtn from "@/components/ui/CircleRadiusBtn";
 import { IMovieListProps } from "@/features/movie/index";
 import { useEffect, useState } from "react";
 
-export default function PhimHot({
+export default function TitleSection({
   status,
 }: {
   status: IMovieListProps["mode"];
@@ -18,8 +18,11 @@ export default function PhimHot({
     } else if (status === "upcoming") {
       const title = "DANH SÁCH PHIM SẮP CHIẾU";
       setTitleList(title);
-    } else {
+    } else if (status === "showing") {
       const title = "DANH SÁCH PHIM ĐANG CHIẾU";
+      setTitleList(title);
+    } else if (status === "select") {
+      const title = "CHỌN RẠP - CHỌN PHIM - CHỌN SUẤT CHIẾU";
       setTitleList(title);
     }
   }, []);
@@ -28,7 +31,7 @@ export default function PhimHot({
     <div className="absolute phim-hot title-bg-general h-[85px] z-30">
       <div className="phim-hot-wrap flex">
         <h1 className={`${oswald.className} phim-hot-title`}>{titleList}</h1>
-        <CircleRadiusBtn />
+        {status != "select" && <CircleRadiusBtn />}
       </div>
     </div>
   );

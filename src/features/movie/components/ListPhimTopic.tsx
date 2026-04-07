@@ -1,8 +1,8 @@
 import React from "react";
-import TitleList from "./loaiDanhSach/TitleList";
-import MovieCardList from "./loaiDanhSach/MovieCardList";
+import MovieCardList from "./cateroryCardList/MovieCardList";
 import { TMovie } from "../types/typeMovie";
 import { IMovieListProps } from "../types/typeCommon";
+import TitleSection from "./cateroryCardList/TitleSection";
 
 export default function ListPhimTopic({
   status,
@@ -13,7 +13,7 @@ export default function ListPhimTopic({
 }) {
   return (
     <div className="relative">
-      <TitleList status={status} />
+      <TitleSection status={status} />
       <MovieCardList status={status} movies={movies} />
     </div>
   );

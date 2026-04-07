@@ -4,8 +4,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,9 +24,9 @@ export default function MovieCardList({
       opts={{
         align: "start",
       }}
-      className="w-full px-10 pt-2 pb-4 overflow-visible"
+      className="w-full px-10 pb-4 overflow-visible"
     >
-      <CarouselContent className="overflow-visible h-[425px]">
+      <CarouselContent className="overflow-visible pt-4 pb-4 h-[450px]">
         {movies.map((movie: TMovie) => (
           <CarouselItem
             key={movie.ma_phim}
