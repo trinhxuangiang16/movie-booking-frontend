@@ -1,7 +1,8 @@
-import React from "react";
+"use client";
+
 import MovieCardList from "./cateroryCardList/MovieCardList";
-import { TMovie } from "../types/typeMovie";
-import { IMovieListProps } from "../types/typeCommon";
+import { TMovie } from "../../types/typeMovie";
+import { IMovieListProps } from "../../types/typeCommon";
 import TitleSection from "./cateroryCardList/TitleSection";
 
 export default function ListPhimTopic({

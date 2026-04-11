@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { oswald } from "@/lib";
 import { IMovieListProps, TMovie } from "@/features/movie/index";
 import "./MovieCardList.css";
+import Link from "next/link";
 
 export default function MovieCardList({
   status,
@@ -46,7 +47,7 @@ export default function MovieCardList({
                   <img
                     src={movie.hinh_anh}
                     alt="poster"
-                    className="aspect-2/3"
+                    className="aspect-2/3 brightness-110 contrast-90 saturate-85 hue-rotate-[10deg]"
                   />
                 </div>
                 <div className="movie-card-info">
@@ -71,7 +72,9 @@ export default function MovieCardList({
                     </div>
                   </div>
                   <div className="movie-card-actions">
-                    <Button>CHI TIẾT PHIM</Button>
+                    <Link href={`/movie/movie-detail/${movie.ma_phim}`}>
+                      <Button> CHI TIẾT PHIM </Button>
+                    </Link>
                     <Heart className="text-red-500" />
                   </div>
                 </div>

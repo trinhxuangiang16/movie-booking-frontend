@@ -1,8 +1,8 @@
 "use client";
 import Banner from "@/components/layout.tsx/Banner";
 import { TMovie, useHotMovies } from "@/features/movie";
-import ListPhimTopic from "@/features/movie/components/ListPhimTopic";
-import SelectMovieSchedule from "@/features/movie/components/selectMovieSchedule/SelectMovieSchedule";
+import ListPhimTopic from "@/features/movie/components/homePage/ListPhimTopic";
+import SelectMovieSchedule from "@/features/movie/components/homePage/SelectMovieSchedule";
 import { useShowingMovies } from "@/features/movie/hooks/useShowingMovies";
 import { useUpComingMovies } from "@/features/movie/hooks/useUpComingMovies";
 
@@ -13,7 +13,7 @@ export default function HomePage() {
 
   const { data: showingMovies = [] as TMovie[] } = useShowingMovies();
   return (
-    <div className="bg-[#0c1137] h-[4000px] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">
+    <div className="bg-[#0c1137] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">
       <Banner />
       <ListPhimTopic status="hot" movies={hotMovies} />
       <ListPhimTopic status="upcoming" movies={upcomingMovies} />

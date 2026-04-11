@@ -25,7 +25,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-import { TMovie } from "../types/typeMovie";
+import { TMovie } from "../../types/typeMovie";
 import { use, useEffect, useState } from "react";
 import { ChartData } from "recharts/types/state/chartDataSlice";
 

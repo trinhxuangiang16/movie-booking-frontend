@@ -14,11 +14,25 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 ::selection {
   background: rgba(255, 0, 80, 0.4);
   color: white;
+}
+
+/* scrollbar gọn */
+.srollbar-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.srollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.srollbar-custom::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.srollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }

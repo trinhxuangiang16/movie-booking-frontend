@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html className="scroll-smooth">
+    <html data-scroll-behavior="smooth" lang="vi">
       <body>
         <QueryProviders>
           <Header />

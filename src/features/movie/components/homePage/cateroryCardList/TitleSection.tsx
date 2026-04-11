@@ -1,3 +1,4 @@
+"use client";
 import "./TitleSection.css";
 import { oswald } from "@/lib";
 import CircleRadiusBtn from "@/components/ui/CircleRadiusBtn";

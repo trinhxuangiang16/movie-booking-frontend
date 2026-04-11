@@ -5,10 +5,10 @@ import { useHotMovies } from "@/features/movie/hooks/useHotMovies";
 import { useEffect, useState } from "react";
 import { TMovie } from "@/features/movie/types/typeMovie";
 import { FaPlay, FaStar } from "react-icons/fa";
-import { ChartTopHot } from "@/features/movie/components/ChartTopHot";
+import { ChartTopHot } from "@/features/movie/components/homePage/ChartTopHot";
 import { oswald } from "@/lib";
 import "./layout.css";
-import TrailerPlayer from "@/features/movie/components/TrailerPlayer";
+import TrailerPlayer from "@/features/movie/components/homePage/TrailerPlayer";
 import Link from "next/link";
 
 type TBannerMode = "slide" | "chart" | "trailer";
