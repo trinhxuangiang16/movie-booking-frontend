@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Movie Booking Frontend (WIP)
 
-## Getting Started
+Frontend web app cho hệ thống đặt vé xem phim. Dự án sử dụng **backend Movie Booking do mình tự xây dựng** (repo backend riêng). Hiện UI/UX đã hoàn thiện khá nhiều; một số flow booking/checkout vẫn đang phát triển.
 
-First, run the development server:
+## Live Demo
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- https://movie-booking-app-pearl.vercel.app
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Next.js 16** (App Router) + **React 19**
+- **TypeScript**
+- **TailwindCSS v4** + animations (`tailwindcss-animate`, `tw-animate-css`)
+- **UI components**: shadcn/ui (via `components.json`), Radix UI, lucide-react
+- **Data fetching / Server state**: TanStack React Query + Axios
+- **Forms & Validation**: React Hook Form + Zod (+ resolvers)
+- **Charts**: Recharts
+- **Media/UX**: Swiper, Embla Carousel, react-youtube
+- **Theme**: next-themes
+- **Tooling**: ESLint
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Implemented Features
 
-## Learn More
+- **Home page**
+  - Banner
+  - Movie lists theo topic (hot / upcoming / showing)
+  - Trailer player (YouTube)
+  - Biểu đồ/section highlight (chart/top hot)
+  - Chọn lịch chiếu (UI)
+- **Movies**
+  - Fetch danh sách phim theo nhóm/trạng thái (React Query hooks)
+  - Movie detail module (đã có structure route/components)
+- **Auth**
+  - Login page & auth feature structure (hooks/services/types)
 
-To learn more about Next.js, take a look at the following resources:
+## Pending (Not finished yet)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Seat selection (chọn ghế)
+- Booking / đặt vé
+- Checkout & tính tiền
+- Payment flow (nếu có)
+- Order history / ticket history (nếu có)
+- Admin management (nếu có)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Architecture (high level)
 
-## Deploy on Vercel
+- `src/app/*`: pages/routes theo Next.js App Router (`/`, `/login`, `/movie/...`)
+- `src/features/*`: chia theo domain (auth, movie) gồm `hooks`, `services`, `types`, `components`
+- `src/providers/*`: providers (React Query, theme, v.v.)
+- `src/schemas/*`: validate schema bằng Zod
+- `src/types/*`: shared types
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Dự án đang trong giai đoạn hoàn thiện booking flow; repo tập trung showcase **UI/UX + TypeScript structure + data fetching patterns**.
