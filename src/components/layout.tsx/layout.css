@@ -92,8 +92,8 @@
 
   color: #660e0e;
   /* border-color: 1px solid rgba(255, 255, 255, 0.764) !important; */
-  filter: drop-shadow(0 0 1px rgba(216, 216, 216, 0.842))
-    drop-shadow(0 0 1px rgba(210, 210, 210, 0.584));
+  filter: drop-shadow(0 0 1px rgb(216, 216, 216))
+    drop-shadow(0 0 1px rgb(210, 210, 210));
 }
 
 .nav a:hover {

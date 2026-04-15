@@ -2,18 +2,17 @@
   position: relative;
   width: 240px;
   height: 340px;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   margin-top: 20px;
   margin-bottom: 20px;
   pointer-events: auto;
   flex-shrink: 0;
-  overflow: visible;
-  transition: transform 0.25s ease;
+  transition: transform 0.3s ease;
 }
 
 .movie-card-wrap:hover {
-  transform: scaleX(1.4);
+  width: 560px;
   margin-top: 30px;
   margin-left: 20px;
   z-index: 50;
@@ -55,9 +54,8 @@
 
 .movie-card-overlay {
   position: absolute;
-  bottom: 0;
+  bottom: 15px;
   left: 0;
-  right: 0;
   padding: 0 22px 30px 22px !important;
   display: flex;
   align-items: center;
@@ -95,8 +93,8 @@
 }
 
 .movie-card-info-content p {
-  color: #d1d5db;
-  font-size: 14px;
+  color: #dee5ef;
+  font-size: 15px;
   margin: 6px 0;
   text-shadow: 0 4px 4px rgba(0, 0, 0);
 }
@@ -153,13 +151,15 @@
 
 .movie-card-wrap:hover .movie-card-overlay {
   opacity: 1;
+  gap: 5%;
 }
 
 .movie-card-wrap:hover .movie-card-poster {
-  width: 80px;
-  height: 170px;
+  width: 25%;
+  aspect-ratio: 2/3;
   margin-top: 0 !important;
   box-shadow: 0 8px 10px rgba(114, 114, 114, 0.723);
+  border: white solid 2px;
 }
 
 .movie-card-wrap:hover .movie-card-poster img {
@@ -169,7 +169,6 @@
 }
 .movie-card-wrap:hover .movie-card-overlay .movie-card-info {
   opacity: 1;
-  transform: scale(0.8);
 }
 .movie-card-wrap:hover .ten-phim {
   opacity: 0;

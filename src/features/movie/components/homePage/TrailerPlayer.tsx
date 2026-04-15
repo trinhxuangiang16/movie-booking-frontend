@@ -8,7 +8,7 @@ export default function TrailerPlayer({
   videoId,
   title,
 }: {
-  videoId: string;
+  videoId: string | undefined;
   title: string;
 }) {
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,9 @@ export default function TrailerPlayer({
   };
 
   return (
-    <div className="relative w-full h-full rounded-xl overflow-hidden">
+    <div
+      className={`relative  rounded-xl overflow-hidden ${title === "trailer-banner" ? "w-full h-full" : " w-full h-[300px]"}`}
+    >
       {/* Loading overlay */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-10">

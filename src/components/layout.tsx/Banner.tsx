@@ -125,7 +125,7 @@ export default function MovieCarousel() {
         <div className="w-1/2 h-1/2 xep-hang video-wrapper">
           <TrailerPlayer
             videoId={activeMovie?.trailer || ""}
-            title="Trailer phim"
+            title="trailer-banner"
           />
         </div>
       )}

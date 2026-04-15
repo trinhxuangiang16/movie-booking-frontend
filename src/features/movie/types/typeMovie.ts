@@ -5,7 +5,7 @@ export type TMovie = {
   mo_ta?: string;
   banner_url?: string;
   danh_gia?: number;
-  trailer?: string;
+  trailer?: string | undefined;
   hot?: boolean;
   dang_chieu?: boolean;
   sap_chieu?: boolean;
