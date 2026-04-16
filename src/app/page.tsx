@@ -1,5 +1,6 @@
 "use client";
 import Banner from "@/components/layout.tsx/Banner";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { TMovie, useHotMovies } from "@/features/movie";
 import ListPhimTopic from "@/features/movie/components/homePage/ListPhimTopic";
 import SelectMovieSchedule from "@/features/movie/components/homePage/SelectMovieSchedule";
@@ -13,12 +14,14 @@ export default function HomePage() {
 
   const { data: showingMovies = [] as TMovie[] } = useShowingMovies();
   return (
-    <div className="bg-[#0c1137] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">
-      <Banner />
-      <ListPhimTopic status="hot" movies={hotMovies} />
-      <ListPhimTopic status="upcoming" movies={upcomingMovies} />
-      <ListPhimTopic status="showing" movies={showingMovies} />
-      <SelectMovieSchedule status="select" />
-    </div>
+    <ProtectedRoute>
+      <div className="bg-[#0c1137] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">
+        <Banner />
+        <ListPhimTopic status="hot" movies={hotMovies} />
+        <ListPhimTopic status="upcoming" movies={upcomingMovies} />
+        <ListPhimTopic status="showing" movies={showingMovies} />
+        <SelectMovieSchedule status="select" />
+      </div>
+    </ProtectedRoute>
   );
 }
