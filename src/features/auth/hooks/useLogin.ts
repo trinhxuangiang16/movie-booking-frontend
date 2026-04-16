@@ -32,10 +32,7 @@ export const useLogin = () => {
       setCookie("accessToken", accessToken, cookieOptions);
       console.log("Cookie đã set");
 
-      setTimeout(() => {
-        console.log("🔄 Redirecting to home...");
-        router.push("/");
-      }, 1000);
+      router.push("/");
     },
     onError: (error) => {
       errorToast("Đăng nhập thất bại!");
