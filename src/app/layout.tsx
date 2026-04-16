@@ -17,7 +17,9 @@ export default function RootLayout({
       <body>
         <QueryProviders>
           <Header />
-          <ProtectedRoute>{children}</ProtectedRoute>
+          {/* <ProtectedRoute> */}
+          {children}
+          {/* </ProtectedRoute> */}
           <Toaster position="top-right" richColors />
         </QueryProviders>
       </body>
