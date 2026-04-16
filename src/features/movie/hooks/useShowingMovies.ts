@@ -6,5 +6,6 @@ export const useShowingMovies = () => {
     queryKey: ["showing-movies"],
     queryFn: showingMovieService.getShowingMovies,
     staleTime: 5 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 };

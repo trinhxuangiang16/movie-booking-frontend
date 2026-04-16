@@ -7,5 +7,6 @@ export const useGetSchedule = (ma_he_thong_rap?: number) => {
     queryFn: () => getScheduleService.getScheduleService(ma_he_thong_rap),
     enabled: !!ma_he_thong_rap,
     staleTime: 5 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 };

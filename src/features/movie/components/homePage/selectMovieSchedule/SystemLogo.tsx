@@ -11,7 +11,6 @@ import {
 import { oswald } from "@/lib";
 import { useEffect, useState } from "react";
 import { useGetSchedule } from "../../../hooks/useGetSchedule";
-import { set } from "zod";
 
 export function SystemLogo() {
   const { data: systemTheaters, isLoading: isLoadingSystemTheaters } =

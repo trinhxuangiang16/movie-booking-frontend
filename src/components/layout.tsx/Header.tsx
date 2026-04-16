@@ -19,7 +19,7 @@ function Header() {
         <Link href="/">Home</Link>
         <Link href="/services">Theaters</Link>
         <Link href="/login">Login</Link>
-        <Link href="/sign-up">Sign Up</Link>
+        <Link href="/register">Sign Up</Link>
         <Link href="#">Log Out</Link>
       </div>
     </div>

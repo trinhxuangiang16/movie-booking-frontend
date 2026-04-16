@@ -12,7 +12,7 @@ export function FormInput<TFieldValues extends FieldValues>({
 }: FormInputProps<TFieldValues>) {
   return (
     <div className="space-y-1">
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm text-[15px]">{label}</label>
 
       <Controller
         control={control}
@@ -28,7 +28,9 @@ export function FormInput<TFieldValues extends FieldValues>({
               type={type}
             />
             {fieldState.error && (
-              <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+              <p className="text-red-500 text-[13px] italic">
+                {fieldState.error.message}
+              </p>
             )}
           </>
         )}

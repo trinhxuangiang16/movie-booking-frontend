@@ -6,5 +6,6 @@ export const useTheaterSystem = () => {
     queryKey: ["theater-system"],
     queryFn: theaterSystemService.getTheaterSystem,
     staleTime: 5 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 };

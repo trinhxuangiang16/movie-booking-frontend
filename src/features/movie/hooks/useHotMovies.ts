@@ -6,5 +6,6 @@ export const useHotMovies = () => {
     queryKey: ["hot-movies"],
     queryFn: hotMovieService.getHotMovies,
     staleTime: 5 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 };

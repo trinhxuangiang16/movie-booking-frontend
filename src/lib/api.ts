@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getCookie } from "cookies-next";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -9,12 +10,10 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const ACCESSTOKEN = localStorage.getItem("accessToken");
+  const ACCESSTOKEN = getCookie("accessToken");
 
   if (ACCESSTOKEN) {
     config.headers.Authorization = `Bearer ${ACCESSTOKEN}`;
-  } else {
-    delete config.headers.Authorization;
   }
 
   return config;
