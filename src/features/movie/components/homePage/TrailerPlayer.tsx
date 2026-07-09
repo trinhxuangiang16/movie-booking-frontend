@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import YouTube from "react-youtube";
-import { set } from "zod";
 
 export default function TrailerPlayer({
   videoId,
@@ -21,7 +20,7 @@ export default function TrailerPlayer({
 
   return (
     <div
-      className={`relative  rounded-xl overflow-hidden ${title === "trailer-banner" ? "w-full h-full" : " w-full h-[300px]"}`}
+      className={`relative overflow-hidden rounded-xl ${title === "trailer-banner" ? "h-full w-full" : "h-[300px] w-full"}`}
     >
       {/* Loading overlay */}
       {loading && (

@@ -4,6 +4,7 @@ import QueryProviders from "@/providers/query-providers";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/layout.tsx/Header";
+import { oswald } from "@/lib";
 
 export default function RootLayout({
   children,
@@ -12,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html data-scroll-behavior="smooth" lang="vi">
-      <body>
+      <body className={oswald.className}>
         <QueryProviders>
           <Header />
           {children}

@@ -1,14 +1,10 @@
 import { Oswald } from "next/font/google";
 
-export const oswald = Oswald({
-  subsets: ["latin"],
+const appFont = Oswald({
+  subsets: ["latin", "latin-ext", "vietnamese"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
-import { Bebas_Neue } from "next/font/google";
-
-export const bebas = Bebas_Neue({
-  subsets: ["latin"],
-  weight: "400",
-});
+export const bebas = appFont;
+export const oswald = appFont;
