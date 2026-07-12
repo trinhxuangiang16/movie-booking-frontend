@@ -6,6 +6,7 @@ import ListPhimTopic from "@/features/movie/components/homePage/ListPhimTopic";
 import SelectMovieSchedule from "@/features/movie/components/homePage/SelectMovieSchedule";
 import { useShowingMovies } from "@/features/movie/hooks/useShowingMovies";
 import { useUpComingMovies } from "@/features/movie/hooks/useUpComingMovies";
+import { SeatMap } from "@/features/booking/component/SeatMap";
 
 export default function HomePage() {
   const { data: hotMovies = [] as TMovie[] } = useHotMovies();
@@ -17,6 +18,7 @@ export default function HomePage() {
     <ProtectedRoute>
       <div className="bg-[#0c1137] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">
         <Banner />
+        <SeatMap />
         <ListPhimTopic status="hot" movies={hotMovies} />
         <ListPhimTopic status="upcoming" movies={upcomingMovies} />
         <ListPhimTopic status="showing" movies={showingMovies} />
