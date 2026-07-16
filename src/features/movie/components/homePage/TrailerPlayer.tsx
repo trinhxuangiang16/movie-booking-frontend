@@ -20,7 +20,7 @@ export default function TrailerPlayer({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl ${title === "trailer-banner" ? "h-full w-full" : "h-[300px] w-full"}`}
+      className={`relative overflow-hidden ${title === "trailer-banner" ? "h-full w-full" : "h-[300px] w-full"}`}
     >
       {/* Loading overlay */}
       {loading && (

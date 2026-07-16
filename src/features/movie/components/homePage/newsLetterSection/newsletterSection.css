@@ -1,0 +1,129 @@
+/* ── Tia đèn premiere chéo, cực mờ ── */
+.nls-ray {
+  mix-blend-mode: screen;
+  opacity: 0.3;
+}
+.nls-ray--l {
+  background: conic-gradient(
+    from 128deg at 18% -10%,
+    transparent 0deg,
+    rgba(127, 239, 255, 0.07) 6deg,
+    transparent 14deg
+  );
+}
+.nls-ray--r {
+  background: conic-gradient(
+    from 232deg at 82% -10%,
+    transparent 0deg,
+    rgba(255, 136, 225, 0.06) 6deg,
+    transparent 14deg
+  );
+}
+
+/* ── Shine quét qua chữ bạc ── */
+.nls-shine {
+  position: absolute;
+  inset: 0;
+  padding-top: inherit;
+  background: linear-gradient(
+    100deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.95) 50%,
+    transparent 58%
+  );
+  background-size: 320% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: nlsSweep 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes nlsSweep {
+  0%,
+  55% {
+    background-position: 120% 0;
+  }
+  90%,
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+/* ── Form: khung vé vát góc, không bo tròn ── */
+.nls-form {
+  --cut: 12px;
+  position: relative;
+  /* viền gradient bằng lớp nền ngoài */
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(127, 239, 255, 0.28),
+    rgba(255, 136, 225, 0.22)
+  );
+  padding: 1px;
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+  transition: filter 0.3s ease;
+}
+.nls-form:focus-within {
+  filter: drop-shadow(0 0 22px rgba(127, 239, 255, 0.25));
+}
+.nls-formInner {
+  background: #05070f;
+  clip-path: polygon(
+    calc(var(--cut) - 1px) 0,
+    100% 0,
+    100% calc(100% - var(--cut) + 1px),
+    calc(100% - var(--cut) + 1px) 100%,
+    0 100%,
+    0 calc(var(--cut) - 1px)
+  );
+}
+.nls-mail {
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.3s ease;
+}
+.nls-form:focus-within .nls-mail {
+  color: #7fefff;
+}
+
+/* Nút bạc kim loại, vát góc đồng bộ */
+.nls-btn {
+  border-radius: 0;
+  clip-path: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px
+  );
+  background: linear-gradient(180deg, #f2f4fa, #c9cede 55%, #9aa1b8);
+  color: #0a0e24;
+  transition:
+    filter 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.nls-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px -6px rgba(220, 228, 255, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nls-shine {
+    animation: none;
+    opacity: 0;
+  }
+  .nls-btn,
+  .nls-form {
+    transition: none;
+  }
+}

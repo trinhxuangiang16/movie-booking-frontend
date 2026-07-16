@@ -108,209 +108,109 @@
   filter: none;
 }
 
-/*Banner*/
-.banner {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  top: 0;
-  left: 0;
-
-  /* 🎬 cinematic teal look */
-  filter: brightness(0.85) contrast(1.15) saturate(0.85) hue-rotate(-10deg)
-    blur(0.3px);
-
-  background-image:
-    /* dark shadow bottom */
-    linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.9) 0%,
-      rgba(0, 0, 0, 0.6) 40%,
-      transparent 100%
-    ),
-    /* teal cinematic overlay */
-    linear-gradient(
-        to right,
-        rgba(0, 60, 80, 0.6) 0%,
-        rgba(0, 40, 60, 0.4) 40%,
-        transparent 70%
-      ),
-    /* noise texture (film grain) */
-    url("http://www.transparenttextures.com/patterns/clean-gray-paper.png"),
-    /* main image */ var(--banner-url);
-
-  background-size: cover, cover, cover, cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* 🎯 blend để ra màu điện ảnh */
-  background-blend-mode: overlay, overlay, soft-light, normal;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-  background-position: 50% 0%;
-}
-
-.banner .slide-banner {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  width: 30%;
-}
-
-.banner .slide-banner .swiper-slide {
-  transition: all 0.8s ease !important;
-  opacity: 0.6;
-  filter: blur(2px) !important;
-  transform: scale(0.95);
-  height: 100%;
-}
-
-.banner .slide-banner .swiper-slide-active {
-  border-radius: 15px;
-  filter: blur(0) !important;
-  opacity: 0.9;
-}
-
-.banner .slide-banner .swiper-slide-prev,
-.banner .slide-banner .swiper-slide-next {
-  opacity: 0.85;
-  filter: blur(0);
-}
-
-.banner .banner-content {
-  left: 5%;
-  position: absolute;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  margin-top: 5%;
-  z-index: 22;
-}
-
-.banner .banner-content .banner-title {
-  position: relative !important;
-  background: linear-gradient(90deg, #63eaff, #ffafeb);
-  background-size: cover;
-  background-clip: text;
-  color: transparent;
-  width: fit-content;
-  font-size: 80px;
-  height: 95px;
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
-}
-
-.banner .banner-content .banner-description {
-  max-width: 500px;
-  font-size: 22px;
-  position: relative !important;
-  background: linear-gradient(90deg, #ffafeb, #63eaff);
-  background-size: cover;
-  background-clip: text;
-  color: transparent;
-  width: fit-content;
-
-  height: 70px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 10px;
-
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
-}
-
-.banner .banner-title:hover,
-.banner .banner-description:hover {
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.842));
-  /* drop-shadow(0 0 6px rgba(151, 255, 250, 0.764)); */
-  /* border-color: 1px solid rgba(0, 0, 0, 0.455); */
-  color: white;
-  /* transform: scale(1.05); */
-}
-
-.banner * {
-  cursor: pointer;
-}
-
-@keyframes animateLogo {
+/* Banner */
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
   to {
-    background-position-x: -1000px;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes heroTitle {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes heroBeam {
+  0% {
+    transform: translateX(-28%);
+  }
+  55% {
+    transform: translateX(28%);
+  }
+  100% {
+    transform: translateX(-28%);
   }
 }
 
-.banner .banner-content .banner-button {
-  display: flex;
-  gap: 20px;
-  font-size: 22px;
-}
-
-/* .banner .banner-content .banner-button .grade {
-  display: flex;
-} */
-
-.banner .banner-content .banner-button div {
-  position: relative !important;
-  background: linear-gradient(90deg, #ffafeb, #63eaff);
-  color: black;
-  border-color: transparent;
-  transition: 0.3s ease;
-  border-radius: 5px;
-  width: 60px;
-  height: 40px;
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
-}
-
-.banner .banner-content .banner-button div:hover {
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
-  transform: scale(1.05);
-  color: white;
-}
-
-.banner .banner-content .banner-button .active-banner {
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
-  transform: scale(1.05);
-  color: white;
-}
-.banner .banner-content .banner-button .grade-banner a {
-  display: flex;
+/* Footer */
+.footer-logo {
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  width: fit-content !important;
-  padding: 4px 13px;
+  font-size: 32px;
+  font-weight: 700;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #ffccf2, #97dde8);
+  transition: 0.3s ease;
 }
-
-.banner .banner-content .banner-button .play-banner {
-  padding: 10px 19px;
+.footer-logo p {
+  z-index: 10;
 }
-
-.banner .banner-content .banner-button .showtimes {
-  font-size: 26px;
-  width: fit-content !important;
-  background: linear-gradient(90deg, #ffafeb, #63eaff);
-  background-size: cover;
-  color: black;
-  padding: 0px 15px;
+.footer-logo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 8px solid black;
+  border-bottom: 8px solid black;
+  z-index: 5;
 }
-
-.xep-hang,
-.trailer-player {
-  margin: auto 5% auto 45% !important;
+.footer-logo::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 4px);
+  border-top: 4px dotted white;
+  border-bottom: 4px dotted white;
+  z-index: 6;
 }
-
-.video-wrapper {
-  border-radius: 16px;
-  overflow: hidden;
+.footer-logo:hover {
+  text-shadow:
+    0 0 2px #fff,
+    0 0 5px #00f0ff,
+    0 0 10px #00f0ff,
+    0 0 20px #00eeff;
+}
+.footer-logo-e {
+  background-color: #c22f4e;
+  color: #fff;
+  width: 32px;
+  height: 80%;
+  text-align: center;
+  rotate: 8deg;
+  border-radius: 8px;
+  font-size: 30px;
+  padding-right: 4px;
+  position: relative;
+  letter-spacing: 1px;
   box-shadow:
-    0 10px 40px rgba(96, 96, 96, 0.678),
-    0 0 60px rgba(255, 119, 162, 0.304);
+    0 0 2px #fffffffc,
+    0 0 5px #ba3f3f,
+    0 0 10px #902727,
+    0 0 20px #842424;
+}
+
+/* film strip chạy như cuộn phim */
+.film-strip-track {
+  background-size: 26px 100%;
+  animation: filmStripRun 1.2s linear infinite;
+}
+
+@keyframes filmStripRun {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -26px;
+  }
 }

@@ -142,12 +142,12 @@ export function SystemLogo() {
         >
           {isLoadingSchedule && <p>Loading schedule...</p>}
 
-          <div className="cum-rap w-1/5 bg-transparent flex flex-col gap-10 px-4 py-6 border-r border-white/20 pr-6">
+          <div className="cum-rap w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
             {Array.isArray(findTheaterToSchedule) &&
               findTheaterToSchedule.map((item: any) => (
                 <Card
                   key={item.ma_cum_rap}
-                  className={`cursor-pointer bg-black/30 border-none hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none text-white ${
+                  className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none text-white ${
                     isActiveCumRap === item.ma_cum_rap &&
                     `drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]`
                   }`}
@@ -160,8 +160,8 @@ export function SystemLogo() {
                     setLichChieu(item.RapPhim?.[0]?.LichChieu || []);
                   }}
                 >
-                  <CardHeader>
-                    <CardTitle className="text-[16px] font-bold">
+                  <CardHeader className="h-full flex items-center">
+                    <CardTitle className="text-[16px] font-bold line-clamp-1">
                       {item.ten_cum_rap}
                     </CardTitle>
                   </CardHeader>
@@ -176,7 +176,7 @@ export function SystemLogo() {
                 return (
                   <Card
                     key={item.ma_rap}
-                    className={`cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
+                    className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
                       isActiveRapPhim === item.ma_rap &&
                       `drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]`
                     }`}
@@ -187,8 +187,8 @@ export function SystemLogo() {
                       setSelectedMovie(undefined);
                     }}
                   >
-                    <CardHeader>
-                      <CardTitle className="text-[16px] font-bold">
+                    <CardHeader className="h-full flex items-center">
+                      <CardTitle className="text-[16px] font-bold line-clamp-1">
                         {item.ten_rap == "Rạp 1"
                           ? "Rạp T01 - Trệt"
                           : item.ten_rap == "Rạp 2"
@@ -201,21 +201,21 @@ export function SystemLogo() {
               })}
           </div>
 
-          <div className="movies w-2/9 bg-transparent px-6 py-6 border-r border-white/20 pr-6 h-[600px] overflow-y-auto srollbar-custom">
+          <div className="movies w-2/9 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
             {movies.map((movie) => (
               <Card
                 key={movie.ma_phim}
-                className={`h-fit cursor-pointer bg-black/30 text-white hover:bg-white/10 shadow-none ring-0 outline-none mb-3  ${
+                className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
                   selectedMovie === movie.ma_phim &&
-                  "text-[#ff6e6e] drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]"
+                  "drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]"
                 }`}
                 onClick={() => {
                   setSelectedMovie(movie.ma_phim);
                   setSelectedDate(undefined);
                 }}
               >
-                <CardHeader className="p-0 h-full flex items-center px-4">
-                  <CardTitle className="text-[16px] font-bold">
+                <CardHeader className="h-full flex items-center">
+                  <CardTitle className="text-[16px] font-bold line-clamp-1">
                     {movie.ten_phim}
                   </CardTitle>
                 </CardHeader>
@@ -223,19 +223,18 @@ export function SystemLogo() {
             ))}
           </div>
 
-          <div className="dates w-1/5 bg-transparent px-6 py-6 border-r border-white/20 pr-6 h-[600px] overflow-y-auto srollbar-custom">
+          <div className="dates w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
             {uniqueDates.map((date) => (
               <Card
                 key={date}
-                className={`
-                   cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none h-fit mb-3 ${
-                     selectedDate === date &&
-                     "text-[#ff6e6e] drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]"
-                   }`}
+                className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
+                  selectedDate === date &&
+                  "drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]"
+                }`}
                 onClick={() => setSelectedDate(date)}
               >
-                <CardHeader>
-                  <CardTitle className="text-[16px] font-bold">
+                <CardHeader className="h-full flex items-center">
+                  <CardTitle className="text-[16px] font-bold line-clamp-1">
                     {formatDate(date)}
                   </CardTitle>
                 </CardHeader>
@@ -243,21 +242,23 @@ export function SystemLogo() {
             ))}
           </div>
 
-          <div className="times w-1/5 bg-transparent px-6 py-6 border-r border-white/20 pr-6 h-[600px] overflow-y-auto">
+          <div className="times w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
             {showTimes.map((item) => (
               <Card
                 key={item.ma_lich_chieu}
-                className="cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none h-fit mb-3"
+                className="h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none"
                 onClick={() => {
                   console.log(item);
                 }}
               >
-                <CardContent className="text-[16px] font-bold">
-                  {new Date(item.ngay_gio_chieu).toLocaleTimeString("vi-VN", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </CardContent>
+                <CardHeader className="h-full flex items-center">
+                  <CardTitle className="text-[16px] font-bold line-clamp-1">
+                    {new Date(item.ngay_gio_chieu).toLocaleTimeString("vi-VN", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </CardTitle>
+                </CardHeader>
               </Card>
             ))}
           </div>

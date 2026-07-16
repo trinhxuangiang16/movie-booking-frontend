@@ -24,14 +24,16 @@ export default function MovieCardList({
     <Carousel
       opts={{
         align: "start",
+        dragFree: true,
+        containScroll: "trimSnaps",
       }}
       className="w-full px-10 pb-4 overflow-visible"
     >
-      <CarouselContent className="overflow-visible pt-4 pb-4 h-[450px]">
+      <CarouselContent className="movie-card-list overflow-visible pt-4 pb-4 h-[450px]">
         {movies.map((movie: TMovie) => (
           <CarouselItem
             key={movie.ma_phim}
-            className="basis-1/6 overflow-visible"
+            className="movie-card-item basis-auto overflow-visible pl-0"
           >
             <div
               className={`movie-card-wrap ${oswald.className}`}
@@ -85,7 +87,6 @@ export default function MovieCardList({
             </div>
           </CarouselItem>
         ))}
-        <CarouselItem className="basis-1/13 opacity-0 pointer-events-none" />
       </CarouselContent>
 
       {/* <CarouselPrevious />
