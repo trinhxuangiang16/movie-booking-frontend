@@ -1,85 +1,54 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { buildSeatMap } from "../utils/seatMap.utils";
 import { mockPhongVe } from "../mock/seatMap.mock";
 import { Seat } from "./Seat";
-import type { Seat as SeatType } from "../types/typeSeat";
 
-export function SeatMap() {
-  const seatMap = buildSeatMap(mockPhongVe);
-  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+/*
+  SeatMap dạng controlled: state ghế do trang booking giữ,
+  để panel thanh toán bên phải cùng đọc chung.
+*/
 
-  // Hàm xử lý khi user click 1 ghế
-  const handleSelectSeat = useCallback((ma_ghe: number) => {
-    setSelectedSeats((prev) => {
-      if (prev.includes(ma_ghe)) {
-        return prev.filter((id) => id !== ma_ghe);
-      }
-      if (prev.length < 8) {
-        return [...prev, ma_ghe];
-      }
-      return prev;
-    });
-  }, []);
+type SeatMapProps = {
+  selectedSeats: number[];
+  onToggleSeat: (ma_ghe: number) => void;
+};
 
-  // Tính tổng tiền: duyệt qua các ghế chọn, lấy loại ghế, nhân với giá
-  const totalPrice = useMemo(() => {
-    const priceByType = {
-      normal: mockPhongVe.gia_ve,
-      vip: mockPhongVe.gia_ve * 1.5,
-      couple: mockPhongVe.gia_ve * 2,
-    };
+const LEGEND = [
+  { label: "Thường", cls: "border border-white/25 bg-white/[.06]" },
+  { label: "VIP", cls: "border border-[#e8c46a]/50 bg-[#e8c46a]/[.12]" },
+  { label: "Ghế đôi", cls: "border border-[#ff88e1]/50 bg-[#ff88e1]/[.12]" },
+  {
+    label: "Đang chọn",
+    cls: "bg-gradient-to-b from-[#8ff3ff] to-[#4fc9e8] shadow-[0_0_8px_rgba(99,234,255,.6)]",
+  },
+  { label: "Đã đặt", cls: "border border-white/[.08] bg-white/[.04]" },
+];
 
-    let total = 0;
-    for (const [row, seats] of Object.entries(seatMap)) {
-      for (const seat of seats) {
-        if (selectedSeats.includes(seat.ma_ghe)) {
-          total += priceByType[seat.type];
-        }
-      }
-    }
-    return total;
-  }, [selectedSeats, seatMap]);
+const CUT_SM =
+  "[clip-path:polygon(4px_0,100%_0,100%_calc(100%-4px),calc(100%-4px)_100%,0_100%,0_4px)]";
+
+export function SeatMap({ selectedSeats, onToggleSeat }: SeatMapProps) {
+  const seatMap = useMemo(() => buildSeatMap(mockPhongVe), []);
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Legend - Hướng dẫn loại ghế */}
-      <div className="flex gap-6 justify-center text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-          <span className="text-gray-300">Ghế thường</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-yellow-400 rounded"></div>
-          <span className="text-gray-300">Ghế VIP</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-pink-400 rounded"></div>
-          <span className="text-gray-300">Ghế đôi</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-red-500 rounded"></div>
-          <span className="text-gray-300">Đã đặt</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-blue-500 rounded border-2 border-blue-800"></div>
-          <span className="text-gray-300">Đang chọn</span>
-        </div>
+    <div className="flex flex-col gap-8">
+      {/* MÀN HÌNH: vòng cung phát sáng */}
+      <div className="relative mx-auto w-full max-w-xl">
+        <div className="h-10 w-full rounded-[100%_100%_0_0/200%_200%_0_0] border-t-2 border-[#63eaff]/70 shadow-[0_-14px_44px_-8px_rgba(99,234,255,.4)]" />
+        <p className="absolute inset-x-0 top-3 text-center text-[10px] font-bold uppercase tracking-[0.5em] text-white/45">
+          Màn hình
+        </p>
+        {/* ánh sáng toả từ màn hình xuống ghế */}
+        <div className="pointer-events-none absolute inset-x-8 top-6 h-24 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(99,234,255,.08),transparent_75%)]" />
       </div>
 
-      {/* Màn hình (Screen) */}
-      <div className="flex justify-center">
-        <div className="text-center text-gray-400 border-t-4 border-gray-500 w-96 py-3">
-          📺 MÀN HÌNH 📺
-        </div>
-      </div>
-
-      {/* Grid ghế */}
-      <div className="flex flex-col gap-3 items-center">
+      {/* GRID GHẾ */}
+      <div className="flex flex-col items-center gap-2.5">
         {Object.entries(seatMap).map(([row, seats]) => (
-          <div key={row} className="flex gap-1">
-            <span className="w-8 h-8 flex items-center justify-center text-xs font-semibold text-gray-400">
+          <div key={row} className="flex items-center gap-1.5">
+            <span className="w-7 text-center text-[11px] font-bold tracking-widest text-white/35">
               {row}
             </span>
             {seats.map((seat) => (
@@ -90,48 +59,26 @@ export function SeatMap() {
                 type={seat.type}
                 status={seat.status === "booked" ? "booked" : "available"}
                 isSelected={selectedSeats.includes(seat.ma_ghe)}
-                onClick={handleSelectSeat}
+                onClick={onToggleSeat}
               />
             ))}
+            <span className="w-7 text-center text-[11px] font-bold tracking-widest text-white/35">
+              {row}
+            </span>
           </div>
         ))}
       </div>
 
-      {/* Info panel: danh sách ghế chọn + tổng tiền */}
-      <div className="mt-4 p-6 bg-white rounded-lg shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <p className="text-sm font-semibold text-gray-700">
-              Ghế chọn:{" "}
-              <span className="text-blue-600">{selectedSeats.length}</span>/8
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              {selectedSeats.length > 0
-                ? `Ghế: ${selectedSeats
-                    .map((id) => {
-                      for (const [_, seats] of Object.entries(seatMap)) {
-                        const found = seats.find((s) => s.ma_ghe === id);
-                        if (found) return found.ten_ghe;
-                      }
-                      return "";
-                    })
-                    .join(", ")}`
-                : "Chưa chọn ghế nào"}
-            </p>
+      {/* LEGEND */}
+      <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 border-t border-white/[.07] pt-6">
+        {LEGEND.map((l) => (
+          <div key={l.label} className="flex items-center gap-2.5">
+            <span className={`h-4 w-4 ${CUT_SM} ${l.cls}`} />
+            <span className="text-xs tracking-[0.08em] text-white/55">
+              {l.label}
+            </span>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-500 mb-1">Tổng tiền</p>
-            <p className="text-2xl font-bold text-red-600">
-              {totalPrice.toLocaleString("vi-VN")} VND
-            </p>
-          </div>
-        </div>
-        <button
-          disabled={selectedSeats.length === 0}
-          className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-        >
-          Tiếp tục ({selectedSeats.length} ghế)
-        </button>
+        ))}
       </div>
     </div>
   );
