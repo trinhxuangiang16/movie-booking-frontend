@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+
 /*
   Hoá đơn kiểu vé rạp: đầu vé thông tin suất chiếu,
   đường xé răng cưa, thân vé liệt kê ghế + dịch vụ, chân vé tổng tiền
@@ -133,21 +135,18 @@ export function TotalServicePayment({
             </span>
           </div>
 
-          <button
+          <Button
             type="button"
             disabled={disabled}
             onClick={onPay}
-            className={`group relative mt-5 w-full overflow-hidden py-3.5 text-sm font-bold uppercase tracking-[0.22em] transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] ${
-              disabled
-                ? "cursor-not-allowed bg-white/[.06] text-white/25"
-                : "bg-gradient-to-r from-[#63eaff] to-[#ff88e1] text-[#06101c] hover:shadow-[0_10px_34px_-8px_rgba(192,132,252,.7)]"
-            }`}
+            variant={disabled ? "paymentDisabled" : "payment"}
+            className="mt-5"
           >
             <span className="relative z-10">Thanh toán</span>
             {!disabled && (
               <span className="absolute inset-0 -translate-x-full bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,.55)_50%,transparent_60%)] transition-transform duration-700 group-hover:translate-x-full" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </aside>

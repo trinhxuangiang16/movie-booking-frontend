@@ -14,7 +14,7 @@ export default function ListPhimTopic({
 }) {
   return (
     <div className="relative">
-      <TitleSection status={status} />
+      <TitleSection status={status} movies={movies} />
       <MovieCardList status={status} movies={movies} />
     </div>
   );

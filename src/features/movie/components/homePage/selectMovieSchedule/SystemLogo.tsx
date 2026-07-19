@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheaterSystem } from "../../../hooks/useGetTheaterSystem";
 import {
@@ -9,80 +9,67 @@ import {
   ITheaterSystem,
 } from "@/features/movie/index";
 import { oswald } from "@/lib";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGetSchedule } from "../../../hooks/useGetSchedule";
 
 export function SystemLogo() {
-  const { data: systemTheaters, isLoading: isLoadingSystemTheaters } =
-    useTheaterSystem();
-  const [selectedTheater, setSelectedTheater] = useState<number | undefined>(0);
+  const router = useRouter();
+  const [selectedTheater, setSelectedTheater] = useState<number | undefined>();
+  const [selectedCumRap, setSelectedCumRap] = useState<number | undefined>();
+  const [selectedRap, setSelectedRap] = useState<number | undefined>();
+  const [selectedMovie, setSelectedMovie] = useState<number | undefined>();
+  const [selectedDate, setSelectedDate] = useState<string | undefined>();
+  const [selectedLichChieu, setSelectedLichChieu] = useState<
+    number | undefined
+  >();
+
+  //  DATA FETCHING — gọi API
+  const { data: systemTheaters } = useTheaterSystem();
+
+  // Chưa chọn hệ thống rạp thì mặc định lấy hệ thống đầu tiên
+  const activeTheater = selectedTheater ?? systemTheaters?.[0]?.ma_he_thong_rap;
 
   const { data: findTheaterToSchedule, isLoading: isLoadingSchedule } =
-    useGetSchedule(selectedTheater);
+    useGetSchedule(activeTheater);
 
-  const [isActiveCumRap, setIsActiveCumRap] = useState<number | undefined>(
-    undefined,
-  );
-  const [cumRap, setCumRap] = useState<ITheaterGroup[]>([]);
+  // Cụm rạp của hệ thống đang chọn
+  const cumRapList: ITheaterGroup[] = Array.isArray(findTheaterToSchedule)
+    ? findTheaterToSchedule
+    : [];
 
-  const [isActiveRapPhim, setIsActiveRapPhim] = useState<number | undefined>(
-    undefined,
-  );
+  const activeCumRap =
+    cumRapList.find((c) => c.ma_cum_rap === selectedCumRap) ?? cumRapList[0];
 
-  const [lichChieu, setLichChieu] = useState<ISchedule[]>([]);
-  const [isActiveLichChieu, setIsActiveLichChieu] = useState<
-    number | undefined
-  >(undefined);
+  const activeRap =
+    activeCumRap?.RapPhim.find((r) => r.ma_rap === selectedRap) ??
+    activeCumRap?.RapPhim[0];
 
-  const [selectedMovie, setSelectedMovie] = useState<number>();
-  const [selectedDate, setSelectedDate] = useState<string | undefined>();
+  const lichChieu: ISchedule[] = activeRap?.LichChieu ?? [];
 
-  useEffect(() => {
-    if (systemTheaters?.length > 0) {
-      setSelectedTheater(systemTheaters[0].ma_he_thong_rap);
-    }
-  }, [systemTheaters]);
-
-  useEffect(() => {
-    if (findTheaterToSchedule?.length > 0) {
-      setIsActiveCumRap(findTheaterToSchedule[0].ma_cum_rap);
-      setCumRap(findTheaterToSchedule);
-    }
-  }, [findTheaterToSchedule]);
-
-  useEffect(() => {
-    const rap = cumRap?.[0]?.RapPhim?.[0];
-
-    if (rap) {
-      setIsActiveRapPhim(rap.ma_rap);
-      setLichChieu(rap.LichChieu);
-    }
-  }, [cumRap]);
-  useEffect(() => {
-    if (movies.length > 0) {
-      setSelectedMovie(movies[0].ma_phim);
-    }
-  }, [lichChieu]);
-
-  useEffect(() => {
-    if (uniqueDates.length > 0) {
-      setSelectedDate(uniqueDates[0]);
-    }
-  }, [selectedMovie]);
-
-  //Xử lý phim chiếu
   const movies = [
     ...new Map(
       lichChieu.map((item) => [item.Phim?.ma_phim, item.Phim]),
     ).values(),
   ];
 
-  //filter lịch theo phim
+  const activeMovie =
+    movies.find((m) => m?.ma_phim === selectedMovie)?.ma_phim ??
+    movies[0]?.ma_phim;
+
   const movieSchedules = lichChieu.filter(
-    (item) => item.Phim.ma_phim === selectedMovie,
+    (item) => item.Phim?.ma_phim === activeMovie,
   );
 
-  //Xử lý ngày giờ chiếu
+  const uniqueDates = [
+    ...new Set(movieSchedules.map((item) => item.ngay_gio_chieu.split("T")[0])),
+  ];
+
+  const activeDate = selectedDate ?? uniqueDates[0];
+
+  const showTimes = movieSchedules.filter(
+    (item) => item.ngay_gio_chieu.split("T")[0] === activeDate,
+  );
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -92,26 +79,22 @@ export function SystemLogo() {
     return `${weekday}${"   "}${day}`;
   };
 
-  const uniqueDates = [
-    ...new Set(movieSchedules.map((item) => item.ngay_gio_chieu.split("T")[0])),
-  ];
-
-  const showTimes = movieSchedules.filter(
-    (item) => item.ngay_gio_chieu.split("T")[0] === selectedDate,
-  );
+  const cardBase =
+    "h-[64px] shrink-0 cursor-pointer rounded-none border-none bg-gradient-to-b from-[#0d1230] to-[#0a0e24] text-white/80 shadow-none ring-1 ring-inset ring-white/10 outline-none transition-all duration-300 [clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)] hover:text-white hover:ring-white/30 hover:shadow-[inset_0_0_18px_-8px_rgba(99,234,255,.35)]";
+  const cardActive =
+    "bg-[linear-gradient(90deg,rgba(99,234,255,.16),rgba(99,234,255,.04)_55%,rgba(255,136,225,.07))] text-[#7fefff] ring-[#63eaff]/60 shadow-[inset_3px_0_0_0_#63eaff,inset_0_0_24px_-8px_rgba(99,234,255,.45)] hover:text-[#7fefff] hover:ring-[#63eaff]/60 hover:shadow-[inset_3px_0_0_0_#63eaff,inset_0_0_24px_-8px_rgba(99,234,255,.45)]";
 
   return (
     <div className="relative py-20">
       <Tabs
-        defaultValue="overview"
         className={`w-8/9 mx-auto  ${oswald.className}`}
-        value={selectedTheater ? String(selectedTheater) : ""}
+        value={activeTheater ? String(activeTheater) : ""}
         onValueChange={(val) => {
           setSelectedTheater(Number(val));
-          setCumRap([]);
-          setIsActiveCumRap(undefined);
-          setIsActiveRapPhim(undefined);
-          setLichChieu([]);
+          setSelectedCumRap(undefined);
+          setSelectedRap(undefined);
+          setSelectedMovie(undefined);
+          setSelectedDate(undefined);
         }}
       >
         <TabsList className="flex flex-col w-[130px] bg-transparent border-r border-white/20 rounded-none items-start gap-2">
@@ -120,14 +103,16 @@ export function SystemLogo() {
               <TabsTrigger
                 value={String(theater.ma_he_thong_rap)}
                 key={theater.ma_he_thong_rap}
-                className="flex flex-col items-center gap-2 w-full text-white bg-transparent shadow-none rounded-none px-0 pb-3 border-0 border-b-2 border-transparent  data-[state=active]:filter data-[state=active]:drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] data-[state=active]:drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] data-[state=active]:text-[#ff6e6e]"
+                className="flex flex-col items-center gap-2 w-full text-white/55 bg-transparent shadow-none rounded-none px-0 pb-3 border-0 border-b-2 border-transparent transition-all duration-300 hover:text-white [&_img]:transition-all [&_img]:duration-300 data-[state=active]:text-[#7fefff] data-[state=active]:drop-shadow-[0_0_14px_rgba(99,234,255,.5)] data-[state=active]:[&_img]:ring-[3px] data-[state=active]:[&_img]:ring-[#63eaff]/60 data-[state=active]:[&_img]:ring-offset-2 data-[state=active]:[&_img]:ring-offset-[#070a1c]"
               >
                 <div className="w-[70px] h-[70px]">
-                  <img
-                    src={theater.logo}
-                    alt={theater.ten_he_thong_rap}
-                    className="object-cover bg-white rounded-full w-full h-full"
-                  />
+                  {theater.logo && (
+                    <img
+                      src={theater.logo}
+                      alt={theater.ten_he_thong_rap}
+                      className="object-cover bg-white rounded-full w-full h-full"
+                    />
+                  )}
                 </div>
 
                 <p className="font-bold">{theater.ten_he_thong_rap}</p>
@@ -137,100 +122,94 @@ export function SystemLogo() {
         </TabsList>
 
         <TabsContent
-          value={selectedTheater?.toString() ?? ""}
+          value={activeTheater?.toString() ?? ""}
           className="flex w-full"
         >
           {isLoadingSchedule && <p>Loading schedule...</p>}
 
           <div className="cum-rap w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
-            {Array.isArray(findTheaterToSchedule) &&
-              findTheaterToSchedule.map((item: any) => (
-                <Card
-                  key={item.ma_cum_rap}
-                  className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none text-white ${
-                    isActiveCumRap === item.ma_cum_rap &&
-                    `drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]`
-                  }`}
-                  onClick={() => {
-                    setIsActiveCumRap(item.ma_cum_rap);
-                    setIsActiveLichChieu(undefined);
-                    setIsActiveRapPhim(item.RapPhim?.[0]?.ma_rap);
-                    setSelectedDate(undefined);
-                    setSelectedMovie(undefined);
-                    setLichChieu(item.RapPhim?.[0]?.LichChieu || []);
-                  }}
-                >
-                  <CardHeader className="h-full flex items-center">
-                    <CardTitle className="text-[16px] font-bold line-clamp-1">
-                      {item.ten_cum_rap}
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              ))}
-          </div>
-
-          <div className="rap-phim w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
-            {cumRap
-              .find((c) => c.ma_cum_rap === isActiveCumRap)
-              ?.RapPhim.map((item: any) => {
-                return (
-                  <Card
-                    key={item.ma_rap}
-                    className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
-                      isActiveRapPhim === item.ma_rap &&
-                      `drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]`
-                    }`}
-                    onClick={() => {
-                      setIsActiveRapPhim(item.ma_rap);
-                      setLichChieu(item.LichChieu);
-                      setSelectedDate(undefined);
-                      setSelectedMovie(undefined);
-                    }}
-                  >
-                    <CardHeader className="h-full flex items-center">
-                      <CardTitle className="text-[16px] font-bold line-clamp-1">
-                        {item.ten_rap == "Rạp 1"
-                          ? "Rạp T01 - Trệt"
-                          : item.ten_rap == "Rạp 2"
-                            ? "Rạp L01 - Lầu 1"
-                            : "Rạp L02 - Lầu 2"}
-                      </CardTitle>
-                    </CardHeader>
-                  </Card>
-                );
-              })}
-          </div>
-
-          <div className="movies w-2/9 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
-            {movies.map((movie) => (
+            {cumRapList.map((item) => (
               <Card
-                key={movie.ma_phim}
-                className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
-                  selectedMovie === movie.ma_phim &&
-                  "drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]"
+                key={item.ma_cum_rap}
+                className={`${cardBase} ${
+                  activeCumRap?.ma_cum_rap === item.ma_cum_rap && cardActive
                 }`}
                 onClick={() => {
-                  setSelectedMovie(movie.ma_phim);
+                  // Đổi cụm rạp → reset rạp/phim/ngày để fallback về mặc định
+                  setSelectedCumRap(item.ma_cum_rap);
+                  setSelectedRap(undefined);
+                  setSelectedMovie(undefined);
                   setSelectedDate(undefined);
                 }}
               >
                 <CardHeader className="h-full flex items-center">
                   <CardTitle className="text-[16px] font-bold line-clamp-1">
-                    {movie.ten_phim}
+                    {item.ten_cum_rap}
                   </CardTitle>
                 </CardHeader>
               </Card>
             ))}
           </div>
 
+          <div className="rap-phim w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+            {activeCumRap?.RapPhim.map((item: ITheater) => {
+              return (
+                <Card
+                  key={item.ma_rap}
+                  className={`${cardBase} ${
+                    activeRap?.ma_rap === item.ma_rap && cardActive
+                  }`}
+                  onClick={() => {
+                    // Đổi rạp → reset phim/ngày
+                    setSelectedRap(item.ma_rap);
+                    setSelectedMovie(undefined);
+                    setSelectedDate(undefined);
+                  }}
+                >
+                  <CardHeader className="h-full flex items-center">
+                    <CardTitle className="text-[16px] font-bold line-clamp-1">
+                      {item.ten_rap == "Rạp 1"
+                        ? "Rạp T01 - Trệt"
+                        : item.ten_rap == "Rạp 2"
+                          ? "Rạp L01 - Lầu 1"
+                          : "Rạp L02 - Lầu 2"}
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="movies w-2/9 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+            {movies.map(
+              (movie) =>
+                movie && (
+                  <Card
+                    key={movie.ma_phim}
+                    className={`${cardBase} ${
+                      activeMovie === movie.ma_phim && cardActive
+                    }`}
+                    onClick={() => {
+                      // Đổi phim → reset ngày
+                      setSelectedMovie(movie.ma_phim);
+                      setSelectedDate(undefined);
+                    }}
+                  >
+                    <CardHeader className="h-full flex items-center">
+                      <CardTitle className="text-[16px] font-bold line-clamp-1">
+                        {movie.ten_phim}
+                      </CardTitle>
+                    </CardHeader>
+                  </Card>
+                ),
+            )}
+          </div>
+
           <div className="dates w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
             {uniqueDates.map((date) => (
               <Card
                 key={date}
-                className={`h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none ${
-                  selectedDate === date &&
-                  "drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[#ff6e6e]"
-                }`}
+                className={`${cardBase} ${activeDate === date && cardActive}`}
                 onClick={() => setSelectedDate(date)}
               >
                 <CardHeader className="h-full flex items-center">
@@ -246,9 +225,14 @@ export function SystemLogo() {
             {showTimes.map((item) => (
               <Card
                 key={item.ma_lich_chieu}
-                className="h-[64px] shrink-0 cursor-pointer bg-black/30 border-none text-white hover:bg-white/10 transition-300 border-none shadow-none ring-0 outline-none"
+                className={`${cardBase} text-white/90 ring-[#ff88e1]/25 hover:bg-[linear-gradient(90deg,#63eaff,#ff88e1)] hover:text-[#06101c] hover:ring-transparent hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,.25)] ${
+                  selectedLichChieu === item.ma_lich_chieu && cardActive
+                }`}
                 onClick={() => {
-                  console.log(item);
+                  setSelectedLichChieu(item.ma_lich_chieu);
+                  router.push(
+                    `/booking-test?ma_lich_chieu=${item.ma_lich_chieu}`,
+                  );
                 }}
               >
                 <CardHeader className="h-full flex items-center">

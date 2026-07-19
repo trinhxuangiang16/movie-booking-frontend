@@ -22,6 +22,7 @@ export default function HomePage() {
   const { data: upcomingMovies = [] as TMovie[] } = useUpComingMovies();
 
   const { data: showingMovies = [] as TMovie[] } = useShowingMovies();
+
   return (
     <ProtectedRoute>
       <div className="bg-[#0c1137] bg-[url('http://www.transparenttextures.com/patterns/black-linen.png')]">

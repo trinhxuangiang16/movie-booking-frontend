@@ -1,4 +1,5 @@
-import { mockPhongVe } from "../mock/seatMap.mock";
+import type { ISeatStatus } from "@/features/movie/services/ticketTheater";
+import type { Seat, SeatType } from "../types/typeSeat";
 
 export function parseSeatCode(ten_ghe: string) {
   const row = ten_ghe.match(/[A-Z]+/)?.[0] ?? "";
@@ -6,32 +7,37 @@ export function parseSeatCode(ten_ghe: string) {
   return { row, col };
 }
 
-export function getSeatType(row: string): "vip" | "normal" | "couple" {
-  if (row === "G" || row === "H") return "couple";
-  if (row === "C" || row === "D") return "vip";
+// loai_ghe trong DB: "Thuong" | "VIP" (ghế đôi chưa có, phòng sẵn khi backend thêm)
+export function getSeatType(loai_ghe?: string | null): SeatType {
+  const t = (loai_ghe ?? "").toLowerCase();
+  if (t.includes("vip")) return "vip";
+  if (t.includes("doi") || t.includes("couple")) return "couple";
   return "normal";
 }
 
-export function buildSeatMap(data: typeof mockPhongVe) {
-  const datVeIds = new Set(data.DatVe.map((v) => v.ma_ghe));
-
-  const seats = data.RapPhim.Ghe.map((ghe) => {
+export function buildSeatMap(danh_sach_ghe: ISeatStatus[]) {
+  const seats: Seat[] = danh_sach_ghe.map((ghe) => {
     const { row, col } = parseSeatCode(ghe.ten_ghe ?? "");
     return {
       ma_ghe: ghe.ma_ghe,
       ten_ghe: ghe.ten_ghe,
       row,
       col,
-      type: getSeatType(row),
-      status: datVeIds.has(ghe.ma_ghe) ? "booked" : "available",
+      type: getSeatType(ghe.loai_ghe),
+      // ghế đang được người khác giữ chỗ cũng không cho chọn
+      status: ghe.da_dat || ghe.dang_giu_cho ? "booked" : "available",
     };
   });
 
-  const grouped: Record<string, typeof seats> = {};
+  const grouped: Record<string, Seat[]> = {};
 
   for (const seat of seats) {
     if (!grouped[seat.row]) grouped[seat.row] = [];
     grouped[seat.row].push(seat);
+  }
+
+  for (const row of Object.keys(grouped)) {
+    grouped[row].sort((a, b) => a.col - b.col);
   }
 
   return grouped;

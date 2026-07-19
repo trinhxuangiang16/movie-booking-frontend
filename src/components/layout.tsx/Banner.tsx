@@ -10,6 +10,7 @@ import { oswald } from "@/lib";
 import "./layout.css";
 import TrailerPlayer from "@/features/movie/components/homePage/TrailerPlayer";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type TBannerMode = "slide" | "chart" | "trailer";
 
@@ -44,7 +45,11 @@ export default function MovieCarousel() {
       <div
         key={activeMovie?.ma_phim}
         className="absolute inset-0 animate-[heroIn_1.1s_cubic-bezier(.2,.7,.2,1)] bg-cover bg-center"
-        style={{ backgroundImage: `url(${activeMovie?.banner_url})` }}
+        style={
+          activeMovie?.banner_url
+            ? { backgroundImage: `url(${activeMovie.banner_url})` }
+            : undefined
+        }
       />
       {/* phủ màu ink thay vì đen thuần — ăn theme các section dưới */}
       <div className="absolute inset-0 bg-[linear-gradient(90deg,#070a1c_0%,rgba(7,10,28,.96)_20%,rgba(7,10,28,.72)_42%,rgba(7,10,28,.28)_68%,rgba(7,10,28,.8)_100%)]" />
@@ -88,25 +93,20 @@ export default function MovieCarousel() {
           </p>
 
           <div className="mt-9 flex items-center gap-3">
-            <Link
-              href=""
-              className="group relative overflow-hidden bg-white px-9 py-4 text-xs font-bold uppercase tracking-[0.18em] text-black transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] hover:tracking-[0.28em]"
-            >
-              <span className="relative z-10 transition-colors group-hover:text-white">
-                Lịch chiếu
-              </span>
-              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-[#63eaff] to-[#ff88e1] transition-transform duration-300 group-hover:translate-x-0" />
-            </Link>
+            <Button asChild variant="bannerCta">
+              <Link href="">
+                <span className="relative z-10 transition-colors group-hover:text-white">
+                  Lịch chiếu
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-[#63eaff] to-[#ff88e1] transition-transform duration-300 group-hover:translate-x-0" />
+              </Link>
+            </Button>
 
-            <button
+            <Button
               onClick={() =>
                 setMode((p) => (p === "chart" ? "slide" : "chart"))
               }
-              className={`flex items-center gap-2 px-6 py-4 text-xs font-bold tracking-wider transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] ${
-                mode === "chart"
-                  ? "bg-gradient-to-r from-[#63eaff] to-[#ff88e1] text-black shadow-[0_0_34px_-6px_rgba(192,132,252,.8)]"
-                  : "border border-white/15 bg-[#0d1230]/60 text-white hover:border-[#63eaff]/50 hover:shadow-[0_0_22px_-6px_rgba(99,234,255,.5)]"
-              }`}
+              variant={mode === "chart" ? "bannerRatingActive" : "bannerRating"}
             >
               <FaStar
                 className={mode === "chart" ? "text-black" : "text-[#ffcf4d]"}
@@ -117,20 +117,18 @@ export default function MovieCarousel() {
               >
                 /10
               </span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={() =>
                 setMode((p) => (p === "trailer" ? "slide" : "trailer"))
               }
-              className={`group grid h-12 w-12 place-items-center transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] ${
-                mode === "trailer"
-                  ? "bg-gradient-to-r from-[#63eaff] to-[#ff88e1] text-black shadow-[0_0_34px_-6px_rgba(192,132,252,.8)]"
-                  : "border border-white/15 bg-[#0d1230]/60 text-white hover:border-[#ff88e1]/50 hover:shadow-[0_0_22px_-6px_rgba(255,136,225,.5)]"
-              }`}
+              variant={
+                mode === "trailer" ? "bannerTrailerActive" : "bannerTrailer"
+              }
             >
               <FaPlay className="ml-0.5 text-[10px] transition-transform group-hover:scale-125" />
-            </button>
+            </Button>
           </div>
         </div>
 

@@ -2,13 +2,15 @@
 import "./TitleSection.css";
 import { oswald } from "@/lib";
 import CircleRadiusBtn from "@/components/ui/CircleRadiusBtn";
-import { IMovieListProps } from "@/features/movie/index";
+import { IMovieListProps, TMovie } from "@/features/movie/index";
 import { useMemo } from "react";
 
 export default function TitleSection({
   status,
+  movies,
 }: {
   status: IMovieListProps["mode"];
+  movies?: TMovie[];
 }) {
   const titleList = useMemo(() => {
     if (status === "hot") return "TOP PHIM HOT TRONG THÁNG";
@@ -25,7 +27,9 @@ export default function TitleSection({
     <div className={`absolute phim-hot title-bg-general h-[85px] z-30 w-full`}>
       <div className="phim-hot-wrap flex">
         <h1 className={`${oswald.className} phim-hot-title`}>{titleList}</h1>
-        {status != "select" && <CircleRadiusBtn />}
+        {status !== "select" && status !== "promotion" && status !== "news" && (
+          <CircleRadiusBtn movies={movies ?? []} />
+        )}
       </div>
     </div>
   );

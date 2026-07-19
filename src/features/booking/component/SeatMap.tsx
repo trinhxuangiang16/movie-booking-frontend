@@ -1,16 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
-import { buildSeatMap } from "../utils/seatMap.utils";
-import { mockPhongVe } from "../mock/seatMap.mock";
+import type { Seat as TSeat } from "../types/typeSeat";
 import { Seat } from "./Seat";
 
 /*
-  SeatMap dạng controlled: state ghế do trang booking giữ,
+  SeatMap dạng controlled: state ghế + dữ liệu ghế do trang booking giữ,
   để panel thanh toán bên phải cùng đọc chung.
 */
 
 type SeatMapProps = {
+  seatMap: Record<string, TSeat[]>;
   selectedSeats: number[];
   onToggleSeat: (ma_ghe: number) => void;
 };
@@ -29,9 +28,7 @@ const LEGEND = [
 const CUT_SM =
   "[clip-path:polygon(4px_0,100%_0,100%_calc(100%-4px),calc(100%-4px)_100%,0_100%,0_4px)]";
 
-export function SeatMap({ selectedSeats, onToggleSeat }: SeatMapProps) {
-  const seatMap = useMemo(() => buildSeatMap(mockPhongVe), []);
-
+export function SeatMap({ seatMap, selectedSeats, onToggleSeat }: SeatMapProps) {
   return (
     <div className="flex flex-col gap-8">
       {/* MÀN HÌNH: vòng cung phát sáng */}

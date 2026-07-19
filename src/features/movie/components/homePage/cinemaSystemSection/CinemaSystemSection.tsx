@@ -32,11 +32,13 @@ export default function CinemaSystemSection() {
                   className="css-item flex shrink-0 cursor-pointer items-center gap-4"
                 >
                   <div className="css-logo shrink-0 overflow-hidden rounded-full bg-white">
-                    <img
-                      src={theater.logo}
-                      alt={theater.ten_he_thong_rap}
-                      className="h-full w-full object-cover"
-                    />
+                    {theater.logo && (
+                      <img
+                        src={theater.logo}
+                        alt={theater.ten_he_thong_rap}
+                        className="h-full w-full object-cover"
+                      />
+                    )}
                   </div>
                   <p className="css-name whitespace-nowrap text-base font-bold text-white/85">
                     {theater.ten_he_thong_rap}

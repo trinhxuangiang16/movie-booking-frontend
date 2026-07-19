@@ -7,6 +7,7 @@ import {
   TPromotionType,
 } from "@/features/movie/types/typeHomeSections";
 import TitleSection from "../cateroryCardList/TitleSection";
+import { TMovie } from "@/features/movie/types/typeMovie";
 
 /*
   Thẻ ưu đãi kiểu "vé mời" (invitation ticket):
@@ -28,7 +29,8 @@ const promotionTypeConfig: Record<
   giam_gia: {
     label: "Giảm giá",
     code: "SALE",
-    accent: "#63eaff",
+    accent: "#e8c46a", // gold — đồng bộ 3 card
+
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -41,12 +43,13 @@ const promotionTypeConfig: Record<
       </svg>
     ),
     pattern:
-      "repeating-linear-gradient(135deg, rgba(99,234,255,.06) 0 2px, transparent 2px 14px)",
+      "repeating-linear-gradient(135deg, rgba(232,196,106,.07) 0 2px, transparent 2px 14px)",
   },
   qua_tang: {
     label: "Quà tặng",
     code: "GIFT",
-    accent: "#c0a4ff",
+    accent: "#e8c46a", // gold — đồng bộ 3 card
+
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -59,12 +62,13 @@ const promotionTypeConfig: Record<
       </svg>
     ),
     pattern:
-      "radial-gradient(circle at 20% 30%, rgba(192,164,255,.09) 0 1.5px, transparent 2px), radial-gradient(circle at 70% 60%, rgba(192,164,255,.07) 0 1.5px, transparent 2px), radial-gradient(circle at 45% 85%, rgba(192,164,255,.08) 0 1.5px, transparent 2px)",
+      "radial-gradient(circle at 20% 30%, rgba(232,196,106,.09) 0 1.5px, transparent 2px), radial-gradient(circle at 70% 60%, rgba(232,196,106,.07) 0 1.5px, transparent 2px), radial-gradient(circle at 45% 85%, rgba(232,196,106,.08) 0 1.5px, transparent 2px)",
   },
   thanh_vien: {
     label: "Thành viên",
     code: "VIP",
-    accent: "#ff88e1",
+    accent: "#e8c46a", // gold — đồng bộ 3 card
+
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -76,18 +80,18 @@ const promotionTypeConfig: Record<
       </svg>
     ),
     pattern:
-      "repeating-conic-gradient(from 45deg at 50% 120%, rgba(255,136,225,.05) 0deg 8deg, transparent 8deg 24deg)",
+      "repeating-conic-gradient(from 45deg at 50% 120%, rgba(232,196,106,.05) 0deg 8deg, transparent 8deg 24deg)",
   },
 };
 
-export default function PromotionSection() {
+export default function PromotionSection({}) {
   const { data: promotions = [] as TPromotion[] } = usePromotions();
 
   if (promotions.length === 0) return null;
-
+  const noneData: TMovie[] = [];
   return (
     <div className="relative">
-      <TitleSection status="promotion" />
+      <TitleSection status="promotion" movies={noneData} />
       <div className={`relative py-20 ${oswald.className}`}>
         <div className="w-8/9 mx-auto">
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
@@ -108,8 +112,17 @@ export default function PromotionSection() {
                     className="absolute inset-0 opacity-80 transition-opacity duration-500 group-hover:opacity-100"
                     style={{ backgroundImage: config.pattern }}
                   />
-                  {/* scrim: dải tối mờ dần từ đáy lên để chữ nổi, phần trên ảnh vẫn sáng */}
-                  <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-[#070a1c] via-[#070a1c]/65 to-transparent" />
+                  {/* scrim: dải tối mờ dần từ đáy lên để chữ metallic nổi, phần trên ảnh vẫn sáng */}
+                  <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-[#070a1c] via-[#070a1c]/80 to-transparent" />
+
+                  {/* chỉ mạ kim loại mảnh ở cạnh đáy: đỏ hồng tan vào vàng, hai đầu mờ dần */}
+                  <div
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] shadow-[0_-1px_6px_rgba(232,196,106,.18)]"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, rgba(232,139,150,0) 0%, rgba(232,139,150,.65) 12%, rgba(192,94,102,.75) 26%, rgba(255,233,168,.95) 48%, rgba(200,155,74,.85) 64%, rgba(255,243,196,1) 80%, rgba(230,198,117,0) 100%)",
+                    }}
+                  />
 
                   {/* viền mảnh: trắng mờ, hover chuyển màu accent */}
                   <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 transition-all duration-500 group-hover:ring-white/0" />
@@ -126,12 +139,15 @@ export default function PromotionSection() {
                       className="absolute inset-y-3 right-0 w-px"
                       style={{
                         backgroundImage:
-                          "repeating-linear-gradient(180deg, rgba(255,255,255,.28) 0 5px, transparent 5px 11px)",
+                          "repeating-linear-gradient(180deg, rgba(238,224,190,.32) 0 5px, transparent 5px 11px)",
                       }}
                     />
                     <span
-                      className="rotate-180 text-[10px] font-bold tracking-[0.5em] [writing-mode:vertical-rl]"
-                      style={{ color: `${config.accent}99` }}
+                      className="rotate-180 text-sm font-black tracking-[0.5em] [writing-mode:vertical-rl]"
+                      style={{
+                        color: config.accent,
+                        textShadow: `0 1px 2px rgba(4,6,15,1), 0 2px 12px rgba(4,6,15,.85), 0 0 16px ${config.accent}66`,
+                      }}
                     >
                       {config.code}
                     </span>
@@ -139,8 +155,11 @@ export default function PromotionSection() {
 
                   {/* icon nét mảnh, lớn, mờ ở góc trên phải như watermark */}
                   <div
-                    className="absolute right-5 top-5 h-14 w-14 opacity-[.28] transition-all duration-500 group-hover:opacity-60 group-hover:-translate-y-0.5"
-                    style={{ color: config.accent }}
+                    className="absolute right-5 top-5 h-14 w-14 opacity-90 transition-all duration-500 group-hover:opacity-100 group-hover:-translate-y-0.5"
+                    style={{
+                      color: config.accent,
+                      filter: `drop-shadow(0 2px 5px rgba(4,6,15,.85)) drop-shadow(0 0 12px ${config.accent}55)`,
+                    }}
                   >
                     {config.icon}
                   </div>
@@ -149,22 +168,26 @@ export default function PromotionSection() {
                   <div className="relative z-10 flex h-full flex-col justify-end py-6 pl-16 pr-6">
                     <p
                       className="text-[10px] font-bold uppercase tracking-[0.35em]"
-                      style={{ color: config.accent }}
+                      style={{
+                        color: config.accent,
+                        textShadow:
+                          "0 1px 2px rgba(4,6,15,1), 0 2px 12px rgba(4,6,15,.85)",
+                      }}
                     >
                       {config.label}
                     </p>
-                    <h3 className="mt-2 line-clamp-1 text-2xl font-bold text-white">
+                    <h3 className="mt-2 line-clamp-1 bg-[linear-gradient(115deg,#ffd3cc_0%,#e88b96_16%,#c05e66_30%,#ffe9a8_46%,#c89b4a_60%,#fff3c4_72%,#e6c675_100%)] bg-clip-text text-[26px] font-bold text-transparent [-webkit-text-stroke:0.4px_rgba(70,35,10,.45)] [filter:drop-shadow(0_1px_1px_rgba(4,6,15,.95))_drop-shadow(0_5px_16px_rgba(4,6,15,.75))]">
                       {promo.tieu_de}
                     </h3>
-                    <p className="mt-2 line-clamp-2 text-sm font-light leading-relaxed text-white/70">
+                    <p className="mt-2 line-clamp-2 text-sm font-normal leading-relaxed text-[#f2ecdf] [text-shadow:0_1px_2px_rgba(4,6,15,.95),0_3px_10px_rgba(4,6,15,.8)]">
                       {promo.mo_ta}
                     </p>
 
                     {promo.han_su_dung && (
                       <div className="mt-4 flex items-center justify-between">
-                        <p className="text-xs tracking-[0.12em] text-white/40">
+                        <p className="text-xs font-semibold tracking-[0.12em] text-[#cdbfa4] [text-shadow:0_1px_6px_rgba(4,6,15,.9)]">
                           Áp dụng đến{" "}
-                          <span className="font-semibold text-white/70">
+                          <span className="font-bold text-[#f8f3e6]">
                             {promo.han_su_dung}
                           </span>
                         </p>

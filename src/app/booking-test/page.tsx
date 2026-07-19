@@ -1,23 +1,22 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
+import { toPng } from "html-to-image";
 import { oswald } from "@/lib";
+import { Button } from "@/components/ui/button";
 import { SeatMap } from "@/features/booking/component/SeatMap";
-import {
-  ExtraServices,
-  EXTRA_SERVICES,
-} from "@/features/booking/component/Extraservices";
+import { ExtraServices } from "@/features/booking/component/Extraservices";
+import { useCombo } from "@/features/booking/hooks/useCombo";
 import { TotalServicePayment } from "@/features/booking/component/Totalservicepayment";
 import { PaymentModal } from "@/features/booking/component/Paymentmodal";
 import { buildSeatMap } from "@/features/booking/utils/seatMap.utils";
-import { mockPhongVe } from "@/features/booking/mock/seatMap.mock";
+import { useGetScheduleByMovieId } from "@/features/movie/hooks/useGetSchedule";
+import { useStatusTheater } from "@/features/movie/hooks/useStatusTheater";
+import { useBooking } from "@/features/movie/hooks/useBooking";
+import { historyPaymentService } from "@/features/booking/services/historyPayment";
 import Link from "next/link";
-
-const MOVIE = {
-  title: "Chị Chị Em Em 2",
-  room: "Rạp 1",
-  showtime: "19:00, Thứ 5 ngày 20/08/2026",
-};
 
 const SEAT_TYPE_LABEL: Record<string, string> = {
   normal: "Thường",
@@ -29,24 +28,98 @@ const CUT_PANEL =
   "[clip-path:polygon(14px_0,100%_0,100%_calc(100%-14px),calc(100%-14px)_100%,0_100%,0_14px)]";
 
 const PAGE_BG =
-  "relative min-h-screen w-full bg-[#0c1137] bg-[url('https://www.transparenttextures.com/patterns/batthern.png')]";
+  "relative min-h-screen w-full bg-[#0c1137] bg-[url('https://www.transparenttextures.com/patterns/batthern.png')] pt-[80px]";
 
-export default function BookingSeatSelectionPage() {
-  const seatMap = useMemo(() => buildSeatMap(mockPhongVe), []);
+// vd: "19:00, Thứ Năm ngày 20/08/2026"
+function formatShowtime(iso: string) {
+  const d = new Date(iso);
+  const time = d.toLocaleTimeString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const weekday = d.toLocaleDateString("vi-VN", { weekday: "long" });
+  return `${time}, ${weekday} ngày ${d.toLocaleDateString("vi-VN")}`;
+}
+
+function CenterNotice({ children }: { children: React.ReactNode }) {
+  return (
+    <div className={PAGE_BG}>
+      <div
+        className={`flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center ${oswald.className}`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function BookingSeatSelection() {
+  const searchParams = useSearchParams();
+  const maLichChieu = Number(searchParams.get("ma_lich_chieu")) || undefined;
+
+  const { data: schedule, isLoading: isLoadingSchedule } =
+    useGetScheduleByMovieId(maLichChieu);
+  const { data: seatStatus, isLoading: isLoadingSeats } =
+    useStatusTheater(maLichChieu);
+  const { data: combos = [] } = useCombo();
+  const { mutateAsync: datVe } = useBooking();
+
+  const seatMap = useMemo(
+    () => buildSeatMap(seatStatus?.danh_sach_ghe ?? []),
+    [seatStatus],
+  );
   const allSeats = useMemo(() => Object.values(seatMap).flat(), [seatMap]);
 
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
-  const [serviceQty, setServiceQty] = useState<Record<string, number>>({});
+  const [serviceQty, setServiceQty] = useState<Record<number, number>>({});
   const [payOpen, setPayOpen] = useState(false);
   const [purchased, setPurchased] = useState(false);
+  const [maVeQr, setMaVeQr] = useState<string | null>(null);
+  const [pendingHoaDon, setPendingHoaDon] = useState<number | null>(null);
+  const [downloading, setDownloading] = useState(false);
+  const ticketRef = useRef<HTMLDivElement>(null);
 
+  // Sau khi webhook xác nhận thanh toán (phase "success" của PaymentModal),
+  // vé thật đã tồn tại — lấy mã QR check-in từ lịch sử đặt vé (đơn vừa chốt).
+  const handlePaid = useCallback(async () => {
+    if (!pendingHoaDon) return;
+    try {
+      const history = await historyPaymentService.getHistoryPaymentService();
+      const hoaDon = history.find((hd) => hd.ma_hoa_don === pendingHoaDon);
+      setMaVeQr(hoaDon?.ma_ve_qr ?? null);
+    } finally {
+      setPurchased(true);
+      setPayOpen(false);
+    }
+  }, [pendingHoaDon]);
+
+  const handleDownloadTicket = useCallback(async () => {
+    if (!ticketRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(ticketRef.current, {
+        pixelRatio: 2,
+        backgroundColor: "#0c1137",
+      });
+      const link = document.createElement("a");
+      link.download = `ve-xem-phim-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } finally {
+      setDownloading(false);
+    }
+  }, []);
+
+  const giaVe = schedule?.gia_ve ?? 0;
+
+  // Hệ số VIP 1.2 phải khớp với cách backend tính tiền khi đặt vé (datVe.service.js)
   const priceByType = useMemo(
     () => ({
-      normal: mockPhongVe.gia_ve,
-      vip: mockPhongVe.gia_ve * 1.5,
-      couple: mockPhongVe.gia_ve * 2,
+      normal: giaVe,
+      vip: giaVe * 1.2,
+      couple: giaVe * 2,
     }),
-    [],
+    [giaVe],
   );
 
   const toggleSeat = useCallback((ma_ghe: number) => {
@@ -74,12 +147,14 @@ export default function BookingSeatSelectionPage() {
 
   const serviceLines = useMemo(
     () =>
-      EXTRA_SERVICES.filter((sv) => (serviceQty[sv.id] ?? 0) > 0).map((sv) => ({
-        label: sv.name,
-        detail: `x${serviceQty[sv.id]}`,
-        amount: sv.price * (serviceQty[sv.id] ?? 0),
-      })),
-    [serviceQty],
+      combos
+        .filter((sv) => (serviceQty[sv.ma_combo] ?? 0) > 0)
+        .map((sv) => ({
+          label: sv.ten_combo,
+          detail: `x${serviceQty[sv.ma_combo]}`,
+          amount: sv.gia * (serviceQty[sv.ma_combo] ?? 0),
+        })),
+    [combos, serviceQty],
   );
 
   const total = useMemo(
@@ -89,6 +164,53 @@ export default function BookingSeatSelectionPage() {
     [seatLines, serviceLines],
   );
 
+  if (!maLichChieu) {
+    return (
+      <CenterNotice>
+        <p className="text-lg text-white/70">
+          Không tìm thấy suất chiếu. Vui lòng chọn suất chiếu từ trang chủ.
+        </p>
+        <Link
+          href="/"
+          className="border border-[#63eaff]/50 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-[#7fefff] transition hover:bg-[#63eaff]/10 [clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)]"
+        >
+          Về trang chủ
+        </Link>
+      </CenterNotice>
+    );
+  }
+
+  if (isLoadingSchedule || isLoadingSeats) {
+    return (
+      <CenterNotice>
+        <p className="animate-pulse text-sm font-bold uppercase tracking-[0.4em] text-[#63eaff]">
+          Đang tải sơ đồ ghế...
+        </p>
+      </CenterNotice>
+    );
+  }
+
+  if (!schedule || !seatStatus) {
+    return (
+      <CenterNotice>
+        <p className="text-lg text-white/70">
+          Không tải được thông tin suất chiếu. Vui lòng thử lại.
+        </p>
+        <Link
+          href="/"
+          className="border border-[#63eaff]/50 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-[#7fefff] transition hover:bg-[#63eaff]/10 [clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)]"
+        >
+          Về trang chủ
+        </Link>
+      </CenterNotice>
+    );
+  }
+
+  const movieTitle = schedule.Phim.ten_phim;
+  const room = schedule.RapPhim.ten_rap;
+  const cinema = schedule.RapPhim.CumRap.ten_cum_rap;
+  const showtime = formatShowtime(schedule.ngay_gio_chieu);
+
   /* ── MÀN HÌNH THÀNH CÔNG: vé xác nhận thay toàn bộ nội dung ── */
   if (purchased) {
     return (
@@ -96,6 +218,7 @@ export default function BookingSeatSelectionPage() {
         <div className={`px-4 py-20 md:px-8 ${oswald.className}`}>
           <div className="mx-auto w-full max-w-xl">
             <div
+              ref={ticketRef}
               className={`relative overflow-hidden bg-gradient-to-b from-[#0d1230] to-[#0a0e24] ring-1 ring-[#63eaff]/25 ${CUT_PANEL}`}
             >
               <div
@@ -148,19 +271,21 @@ export default function BookingSeatSelectionPage() {
                   <p className="text-[10px] uppercase tracking-[0.3em] text-white/35">
                     Phim
                   </p>
-                  <p className="mt-1 font-bold text-white">{MOVIE.title}</p>
+                  <p className="mt-1 font-bold text-white">{movieTitle}</p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.3em] text-white/35">
                     Suất chiếu
                   </p>
-                  <p className="mt-1 font-bold text-white">{MOVIE.showtime}</p>
+                  <p className="mt-1 font-bold text-white">{showtime}</p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.3em] text-white/35">
                     Phòng chiếu
                   </p>
-                  <p className="mt-1 font-bold text-white">{MOVIE.room}</p>
+                  <p className="mt-1 font-bold text-white">
+                    {cinema} - {room}
+                  </p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.3em] text-white/35">
@@ -192,6 +317,17 @@ export default function BookingSeatSelectionPage() {
                 </div>
               </div>
 
+              {maVeQr && (
+                <div className="flex flex-col items-center gap-2 border-t border-white/[.08] px-8 py-6">
+                  <span className="inline-block rounded-lg bg-white p-2.5">
+                    <QRCodeSVG value={maVeQr} size={120} />
+                  </span>
+                  <p className="text-center text-[11px] font-light text-white/45">
+                    Đưa mã này cho soát vé tại rạp
+                  </p>
+                </div>
+              )}
+
               <div
                 className="h-5 w-full opacity-15"
                 style={{
@@ -201,12 +337,23 @@ export default function BookingSeatSelectionPage() {
               />
             </div>
 
-            <Link
-              href="/"
-              className="mx-auto mt-8 block w-fit border border-[#63eaff]/50 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-[#7fefff] transition hover:bg-[#63eaff]/10 hover:shadow-[0_0_24px_rgba(99,234,255,.3)] [clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)]"
-            >
-              Về trang chủ
-            </Link>
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <Button
+                type="button"
+                variant="payRetry"
+                disabled={downloading}
+                onClick={handleDownloadTicket}
+                className="w-fit flex-none px-8 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {downloading ? "Đang tạo ảnh..." : "Tải vé về máy"}
+              </Button>
+              <Link
+                href="/"
+                className="mx-auto block w-fit border border-[#63eaff]/50 px-8 py-3 text-xs font-bold uppercase tracking-[0.25em] text-[#7fefff] transition hover:bg-[#63eaff]/10 hover:shadow-[0_0_24px_rgba(99,234,255,.3)] [clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)]"
+              >
+                Về trang chủ
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -226,11 +373,11 @@ export default function BookingSeatSelectionPage() {
                 Chọn ghế
               </h1>
               <p className="mt-0.5 text-sm text-white/45">
-                {MOVIE.title}
+                {movieTitle}
                 <span className="mx-2 text-white/20">|</span>
-                {MOVIE.room}
+                {cinema} - {room}
                 <span className="mx-2 text-white/20">|</span>
-                {MOVIE.showtime}
+                {showtime}
               </p>
             </div>
           </div>
@@ -242,6 +389,7 @@ export default function BookingSeatSelectionPage() {
                 className={`bg-[#0a0e24]/70 p-8 ring-1 ring-white/[.08] backdrop-blur-[2px] ${CUT_PANEL}`}
               >
                 <SeatMap
+                  seatMap={seatMap}
                   selectedSeats={selectedSeats}
                   onToggleSeat={toggleSeat}
                 />
@@ -257,9 +405,10 @@ export default function BookingSeatSelectionPage() {
                   </h2>
                 </div>
                 <ExtraServices
+                  services={combos}
                   quantities={serviceQty}
-                  onChange={(id, qty) =>
-                    setServiceQty((p) => ({ ...p, [id]: qty }))
+                  onChange={(ma_combo, qty) =>
+                    setServiceQty((p) => ({ ...p, [ma_combo]: qty }))
                   }
                 />
               </section>
@@ -268,9 +417,9 @@ export default function BookingSeatSelectionPage() {
             {/* CỘT PHẢI: hoá đơn dính */}
             <div className="lg:sticky lg:top-24">
               <TotalServicePayment
-                movieTitle={MOVIE.title}
-                showtime={MOVIE.showtime}
-                room={MOVIE.room}
+                movieTitle={movieTitle}
+                showtime={showtime}
+                room={`${cinema} - ${room}`}
                 seatLines={seatLines}
                 serviceLines={serviceLines}
                 total={total}
@@ -285,12 +434,42 @@ export default function BookingSeatSelectionPage() {
           open={payOpen}
           total={total}
           onClose={() => setPayOpen(false)}
-          onSuccess={() => {
-            setPayOpen(false);
-            setPurchased(true);
+          onConfirm={async () => {
+            const danh_sach_combo = Object.entries(serviceQty)
+              .filter(([, qty]) => qty > 0)
+              .map(([ma_combo, so_luong]) => ({
+                ma_combo: Number(ma_combo),
+                so_luong,
+              }));
+
+            const result = await datVe({
+              ma_lich_chieu: maLichChieu,
+              danh_sach_ve: selectedSeats.map((ma_ghe) => ({ ma_ghe })),
+              ...(danh_sach_combo.length > 0 && { danh_sach_combo }),
+            });
+            setPendingHoaDon(result.ma_hoa_don);
+            return result;
           }}
+          onPaid={handlePaid}
         />
       </div>
     </div>
+  );
+}
+
+export default function BookingSeatSelectionPage() {
+  // useSearchParams bắt buộc nằm trong Suspense boundary khi build production
+  return (
+    <Suspense
+      fallback={
+        <CenterNotice>
+          <p className="animate-pulse text-sm font-bold uppercase tracking-[0.4em] text-[#63eaff]">
+            Đang tải...
+          </p>
+        </CenterNotice>
+      }
+    >
+      <BookingSeatSelection />
+    </Suspense>
   );
 }
