@@ -7,7 +7,6 @@ export function parseSeatCode(ten_ghe: string) {
   return { row, col };
 }
 
-// loai_ghe trong DB: "Thuong" | "VIP" (ghế đôi chưa có, phòng sẵn khi backend thêm)
 export function getSeatType(loai_ghe?: string | null): SeatType {
   const t = (loai_ghe ?? "").toLowerCase();
   if (t.includes("vip")) return "vip";
@@ -24,8 +23,13 @@ export function buildSeatMap(danh_sach_ghe: ISeatStatus[]) {
       row,
       col,
       type: getSeatType(ghe.loai_ghe),
-      // ghế đang được người khác giữ chỗ cũng không cho chọn
-      status: ghe.da_dat || ghe.dang_giu_cho ? "booked" : "available",
+
+      status:
+        ghe.da_dat ||
+          (ghe.dang_giu_cho &&
+            (!ghe.la_cua_toi || ghe.loai_giu_cho === "da_tao_don"))
+          ? "booked"
+          : "available",
     };
   });
 

@@ -21,21 +21,16 @@ export default function NewsSection() {
       <div className={`relative py-16 ${oswald.className}`}>
         <div className="w-8/9 mx-auto">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_1fr]">
-            {/* ── BÀI NỔI BẬT: khung chiếu phim ── */}
             <article className="group relative h-[440px] cursor-pointer overflow-hidden [clip-path:polygon(14px_0,100%_0,100%_calc(100%-14px),calc(100%-14px)_100%,0_100%,0_14px)]">
               <img
                 src={featured.hinh_anh}
                 alt={featured.tieu_de}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]"
               />
-              {/* phủ ink theo theme */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#070a1c] via-[#070a1c]/55 to-[#070a1c]/10" />
-              {/* răng phim dọc mép trái */}
               <div className="pointer-events-none absolute inset-y-0 left-0 w-5 bg-[repeating-linear-gradient(180deg,rgba(255,255,255,.7)_0_8px,transparent_8px_22px)] opacity-15" />
-              {/* viền tím hiện dần khi hover */}
               <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#c0a4ff]/0 transition-all duration-500 group-hover:ring-[#c0a4ff]/50" />
 
-              {/* nhãn NỔI BẬT kiểu vé */}
               <span className="absolute left-7 top-6 z-10 border border-[#ff88e1]/60 bg-[#070a1c]/70 px-3.5 py-1.5 text-[10px] font-bold tracking-[0.3em] text-[#ff88e1]">
                 NỔI BẬT
               </span>
@@ -57,17 +52,14 @@ export default function NewsSection() {
               </div>
             </article>
 
-            {/* ── DANH SÁCH: dòng tin với tem lịch ── */}
             <div className="flex flex-col justify-center gap-1">
               {rest.map((item) => (
                 <article
                   key={item.ma_tin}
                   className="group relative flex cursor-pointer items-center gap-6 border-b border-white/[.07] py-6 pl-6 pr-4 transition-colors duration-300 last:border-b-0 hover:bg-[#c0a4ff]/[.05]"
                 >
-                  {/* vạch gradient trái mọc ra khi hover */}
                   <span className="absolute left-0 top-1/2 h-0 w-[2.5px] -translate-y-1/2 bg-gradient-to-b from-[#63eaff] via-[#c0a4ff] to-[#ff88e1] transition-all duration-300 group-hover:h-2/3" />
 
-                  {/* tem lịch: số to trong khung vát góc */}
                   <div className="relative shrink-0 border border-white/12 bg-white/[.03] px-3.5 py-2.5 text-center [clip-path:polygon(7px_0,100%_0,100%_calc(100%-7px),calc(100%-7px)_100%,0_100%,0_7px)] transition-colors duration-300 group-hover:border-[#63eaff]/40">
                     <p className="text-2xl font-bold leading-none text-white transition-colors duration-300 group-hover:text-[#7fefff]">
                       {formatDate(item.ngay_dang).split("/")[0]}

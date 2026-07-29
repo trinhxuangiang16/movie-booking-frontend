@@ -5,7 +5,7 @@ import { SystemLogo } from "./selectMovieSchedule/SystemLogo";
 export default function SelectMovieSchedule({ status }: { status: string }) {
   const noneData: TMovie[] = [];
   return (
-    <div className="relative w-full">
+    <div id="lich-chieu-phim" className="relative w-full scroll-mt-24">
       <TitleSection status={status} movies={noneData} />
       <SystemLogo />
     </div>

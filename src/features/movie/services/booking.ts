@@ -20,14 +20,13 @@ export interface IBookedCombo {
   don_gia: number;
 }
 
-// Kết quả tạo đơn "chờ thanh toán" — thay thế hoàn toàn luồng đặt-xong-ngay cũ.
-// Backend chỉ tạo DatVe thật sau khi webhook ngân hàng xác nhận thanh toán.
+
 export interface IPendingOrderResult {
   ma_hoa_don: number;
   tong_tien: number;
-  noi_dung_chuyen_khoan: string; // vd "DH1023" — user phải nhập đúng khi chuyển khoản
-  het_han_luc: string; // ISO — đơn tự hủy giữ ghế sau mốc này
-  qr_url: string; // ảnh QR VietQR build sẵn từ BE
+  noi_dung_chuyen_khoan: string;
+  het_han_luc: string;
+  qr_url: string;
   danh_sach_ghe: IBookedTicket[];
   danh_sach_combo: IBookedCombo[];
 }
@@ -45,8 +44,32 @@ export interface IOrderStatus {
   het_han_luc: string | null;
 }
 
+export interface ICancelOrderResult {
+  ma_hoa_don: number;
+  trang_thai_thanh_toan: TrangThaiThanhToan;
+  ma_lich_chieu?: number;
+}
+
+
+export interface IGrantTicketPayload {
+  ma_lich_chieu: number;
+  danh_sach_ve: { ma_ghe: number }[];
+  danh_sach_combo?: { ma_combo: number; so_luong: number }[];
+  email_khach?: string;
+  ly_do?: string;
+}
+
+export interface IGrantTicketResult {
+  ma_hoa_don: number;
+  tai_khoan_nhan: number;
+  email_khach: string | null;
+  tong_tien: number;
+  trang_thai_thanh_toan: TrangThaiThanhToan;
+  ma_lich_chieu: number;
+  danh_sach_ghe: IBookedTicket[];
+}
+
 export const bookingService = {
-  // Tạo đơn chờ thanh toán: giữ ghế + trả thông tin QR VietQR để hiển thị
   taoDonChoThanhToan: async (
     payload: IBookingPayload,
   ): Promise<IPendingOrderResult> => {
@@ -54,11 +77,24 @@ export const bookingService = {
     return res.data?.data;
   },
 
-  // Poll trạng thái đơn trong lúc chờ webhook ngân hàng xác nhận
   layTrangThaiHoaDon: async (ma_hoa_don: number): Promise<IOrderStatus> => {
     const res = await api.get(`QuanLyDatVe/TrangThaiHoaDon`, {
       params: { ma_hoa_don },
     });
+    return res.data?.data;
+  },
+
+
+  huyGiaoDich: async (ma_hoa_don: number): Promise<ICancelOrderResult> => {
+    const res = await api.post(`QuanLyDatVe/HuyGiaoDich`, { ma_hoa_don });
+    return res.data?.data;
+  },
+
+
+  capVeTrucTiep: async (
+    payload: IGrantTicketPayload,
+  ): Promise<IGrantTicketResult> => {
+    const res = await api.post(`QuanLyDatVe/CapVeTrucTiep`, payload);
     return res.data?.data;
   },
 };

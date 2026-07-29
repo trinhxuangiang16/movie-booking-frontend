@@ -13,10 +13,7 @@ type SeatProps = {
   onClick: (ma_ghe: number) => void;
 };
 
-/*
-  Ghế kiểu "ô vé" vát góc, mỗi loại 1 accent trong dải theme:
-  thường = trắng mờ, VIP = gold, đôi = pink, đang chọn = cyan glow, đã đặt = chìm
-*/
+
 
 function SeatComponent({
   ma_ghe,

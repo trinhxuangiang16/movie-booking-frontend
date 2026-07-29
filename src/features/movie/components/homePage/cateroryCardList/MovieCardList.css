@@ -43,7 +43,6 @@
   inset: -48px;
 }
 
-/* Scrim ink + dải răng phim mép trái — chỉ hiện khi card mở rộng */
 .movie-card-wrap::after {
   content: "";
   position: absolute;
@@ -53,20 +52,15 @@
   opacity: 0;
   transition: opacity 0.35s ease;
   background:
-    repeating-linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.14) 0 10px,
-        transparent 10px 26px
-      )
-      left top / 6px 100% no-repeat,
+    repeating-linear-gradient(180deg,
+      rgba(255, 255, 255, 0.14) 0 10px,
+      transparent 10px 26px) left top / 6px 100% no-repeat,
     linear-gradient(to top, rgba(7, 10, 28, 0.92), transparent 55%),
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       rgba(7, 10, 28, 0.92) 0%,
       rgba(7, 10, 28, 0.6) 38%,
       rgba(7, 10, 28, 0.18) 70%,
-      rgba(7, 10, 28, 0.55) 100%
-    );
+      rgba(7, 10, 28, 0.55) 100%);
 }
 
 .movie-card-wrap:hover::after {
@@ -86,7 +80,7 @@
   position: absolute;
   bottom: 15px;
   left: 0;
-  z-index: 2; /* nổi trên lớp scrim ::after khi hover */
+  z-index: 2;
   padding: 0 22px 30px 22px !important;
   display: flex;
   align-items: center;
@@ -148,17 +142,14 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  clip-path: polygon(
-    4px 0,
-    100% 0,
-    100% calc(100% - 4px),
-    calc(100% - 4px) 100%,
-    0 100%,
-    0 4px
-  );
+  clip-path: polygon(4px 0,
+      100% 0,
+      100% calc(100% - 4px),
+      calc(100% - 4px) 100%,
+      0 100%,
+      0 4px);
 }
 
-/* badge trạng thái — cyan neon */
 .movie-card-tags span:first-child {
   color: #7fefff;
   border: 1px solid rgba(99, 234, 255, 0.5);
@@ -166,7 +157,6 @@
   box-shadow: 0 0 12px -4px rgba(99, 234, 255, 0.5);
 }
 
-/* badge điểm đánh giá — gold, ăn theo accent ghế VIP */
 .movie-card-tags span:last-child {
   color: #e8c46a;
   border: 1px solid rgba(232, 196, 106, 0.5);
@@ -204,9 +194,11 @@
   height: 100%;
   object-fit: cover;
 }
+
 .movie-card-wrap:hover .movie-card-overlay .movie-card-info {
   opacity: 1;
 }
+
 .movie-card-wrap:hover .ten-phim {
   opacity: 0;
   height: 40px !important;

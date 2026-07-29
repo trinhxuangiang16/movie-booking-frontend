@@ -1,5 +1,8 @@
+"use client";
+
 import { bebas } from "@/lib";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FaAngleRight } from "react-icons/fa";
 import {
   Dialog,
@@ -13,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./button";
 import { TMovie } from "@/features/movie/types/typeMovie";
+import type { IMovieListProps } from "@/features/movie";
 import {
   Table,
   TableBody,
@@ -23,16 +27,59 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
+
+type SectionStatus = IMovieListProps["mode"];
+
+const SECTION_META: Partial<
+  Record<NonNullable<SectionStatus>, { title: string; desc: string }>
+> = {
+  hot: {
+    title: "Top phim hot trong tháng",
+    desc: "Những phim được khán giả quan tâm nhất, tổng hợp trên toàn hệ thống.",
+  },
+  showing: {
+    title: "Phim đang chiếu",
+    desc: "Các phim đang có suất chiếu — chọn phim để đặt vé ngay.",
+  },
+  upcoming: {
+    title: "Phim sắp chiếu",
+    desc: "Sắp ra rạp — xem trước để không bỏ lỡ suất chiếu đầu tiên.",
+  },
+  cinema: {
+    title: "Danh sách phim",
+    desc: "Toàn bộ phim hiện có trên hệ thống đặt vé trực tuyến.",
+  },
+};
+
+export default function CircleRadiusBtn({
+  movies,
+  status,
+}: {
+  movies: TMovie[];
+  status?: SectionStatus;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const meta =
+    (status && SECTION_META[status as NonNullable<SectionStatus>]) ||
+    SECTION_META.cinema!;
+
+
+  const goToDetail = (ma_phim: number) => {
+    setOpen(false);
+    router.push(`/movie/movie-detail/${ma_phim}`);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Link
+        <button
+          type="button"
+          aria-label={`Xem thêm: ${meta.title}`}
           className={`ml-5 ${bebas.className} flex items-center`}
-          href={"/"}
         >
           <svg width="0" height="0">
-            {/* Định nghĩa gradient cho icon */}
             <defs>
               <linearGradient
                 id="iconGradient"
@@ -46,7 +93,7 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
               </linearGradient>
             </defs>
           </svg>
-          <div className="group inline-flex  items-center overflow-hidden rounded-full border border-[#63eaff] transition-all duration-100 w-12 h-12 hover:w-30 px-4 py-3 cursor-pointer hover:shadow-[0_0_20px_#ffafeb7f]">
+          <div className="group inline-flex items-center overflow-hidden rounded-full border border-[#63eaff] transition-all duration-100 w-12 h-12 hover:w-30 px-4 py-3 cursor-pointer hover:shadow-[0_0_20px_#ffafeb7f]">
             <FaAngleRight
               className="shrink-0 flex items-center"
               style={{ fill: "url(#iconGradient)" }}
@@ -59,36 +106,38 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
               Xem thêm
             </span>
           </div>
-        </Link>
+        </button>
       </DialogTrigger>
       <DialogContent
         className="
-    w-[80vw] 
-    max-w-[80vw] 
-    sm:w-[80vw]       
-    sm:max-w-[80vw] 
-    h-[90vh] 
-    rounded-2xl p-6
-    bg-zinc-950/75 
-    backdrop-blur-xl 
+    w-[92vw]
+    max-w-[1100px]
+    sm:max-w-[1100px]
+    h-[88vh]
+    p-0
+    gap-0
+    bg-[#0a0e24]/95
+    backdrop-blur-xl
     border border-white/10
     shadow-2xl shadow-black/80
-    flex flex-col justify-between 
-    text-white 
+    flex flex-col
+    text-white
     overflow-hidden
+    [clip-path:polygon(16px_0,100%_0,100%_calc(100%-16px),calc(100%-16px)_100%,0_100%,0_16px)]
   "
       >
-        {/* 1. HEADER (Cố định ở trên) */}
-        <DialogHeader className="shrink-0 pb-4 border-b border-white/5">
-          <DialogTitle className="text-2xl font-bold tracking-tight bg-gradient-to-r from-amber-200 to-yellow-500 bg-clip-text text-transparent">
-            Danh sách phim
-          </DialogTitle>
-          <DialogDescription className="text-zinc-400 text-sm">
-            Danh sách các phim hiện đang có trên hệ thống để đặt vé trực tuyến.
+        <DialogHeader className="shrink-0 space-y-1 px-7 pb-4 pt-6 text-left">
+          <div className="flex items-center gap-3">
+            <span className="h-7 w-[3px] rounded-full bg-gradient-to-b from-[#63eaff] to-[#ff88e1]" />
+            <DialogTitle className="text-xl font-bold uppercase tracking-wide text-white">
+              {meta.title}
+            </DialogTitle>
+          </div>
+          <DialogDescription className="pl-[15px] text-sm font-light text-white/45">
+            {meta.desc}
           </DialogDescription>
         </DialogHeader>
 
-        {/* 2. TABLE BODY (Khu vực cuộn nội dung ở giữa) */}
         <div
           className="
           flex-1 my-4 overflow-y-auto pr-2
@@ -102,24 +151,24 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
         "
         >
           <Table>
-            <TableHeader className="sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-white/10">
-              <TableRow className="border-b border-white/5 hover:bg-transparent">
-                <TableHead className="w-[60px] text-zinc-400 font-semibold">
+            <TableHeader className="sticky top-0 z-10 bg-[#0a0e24]/95 backdrop-blur-md">
+              <TableRow className="border-b border-white/10 hover:bg-transparent">
+                <TableHead className="w-[56px] text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
                   STT
                 </TableHead>
-                <TableHead className="w-[100px] text-zinc-400 font-semibold">
+                <TableHead className="w-[90px] text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
                   Hình ảnh
                 </TableHead>
-                <TableHead className="text-zinc-400 font-semibold">
-                  Tên Phim
+                <TableHead className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
+                  Tên phim
                 </TableHead>
-                <TableHead className="text-zinc-400 font-semibold">
+                <TableHead className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
                   Khởi chiếu
                 </TableHead>
-                <TableHead className="text-center text-zinc-400 font-semibold">
+                <TableHead className="text-center text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
                   Đánh giá
                 </TableHead>
-                <TableHead className="text-right text-zinc-400 font-semibold">
+                <TableHead className="text-right text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
                   Trạng thái
                 </TableHead>
               </TableRow>
@@ -130,16 +179,24 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
                 movies.map((movie, index) => (
                   <TableRow
                     key={movie.ma_phim}
-                    className="group border-b border-white/5 hover:bg-white/5 transition-colors duration-200"
+                    onClick={() => goToDetail(movie.ma_phim)}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Xem chi tiết phim ${movie.ten_phim}`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        goToDetail(movie.ma_phim);
+                      }
+                    }}
+                    className="group cursor-pointer border-b border-white/[.06] transition-colors duration-200 hover:bg-white/[.04] focus-visible:bg-white/[.04] focus-visible:outline-none"
                   >
-                    {/* Số thứ tự */}
-                    <TableCell className="font-medium text-zinc-400 group-hover:text-white transition-colors">
+                    <TableCell className="font-medium tabular-nums text-white/40 transition-colors group-hover:text-[#7fefff]">
                       {String(index + 1).padStart(2, "0")}
                     </TableCell>
 
-                    {/* Poster phim với hiệu ứng zoom nhẹ khi hover dòng */}
                     <TableCell>
-                      <div className="h-16 w-11 rounded-md overflow-hidden border border-white/10 shadow-md shadow-black/50">
+                      <div className="h-16 w-11 overflow-hidden border border-white/10 shadow-md shadow-black/50 [clip-path:polygon(5px_0,100%_0,100%_calc(100%-5px),calc(100%-5px)_100%,0_100%,0_5px)]">
                         {movie.hinh_anh && (
                           <img
                             src={movie.hinh_anh}
@@ -150,57 +207,48 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
                       </div>
                     </TableCell>
 
-                    {/* Tên phim kèm badge HOT nếu có */}
-                    <TableCell className="font-semibold text-zinc-100 group-hover:text-yellow-400 transition-colors">
+                    <TableCell className="font-semibold text-white/90 transition-colors group-hover:text-[#7fefff]">
                       <div className="flex items-center gap-2">
                         <span>{movie.ten_phim}</span>
                         {movie.hot && (
-                          <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] px-1.5 py-0 font-bold tracking-wider animate-pulse">
-                            HOT
+                          <Badge className="border border-[#ff88e1]/30 bg-[#ff88e1]/15 px-1.5 py-0 text-[10px] font-bold uppercase tracking-wider text-[#ff88e1]">
+                            Hot
                           </Badge>
                         )}
+                        <FaAngleRight className="ml-0.5 h-3 w-3 shrink-0 -translate-x-1 text-[#63eaff] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
                       </div>
                     </TableCell>
 
-                    {/* Ngày khởi chiếu */}
-                    <TableCell className="text-zinc-300 text-sm">
+                    <TableCell className="text-sm text-white/55">
                       {movie.ngay_khoi_chieu
                         ? new Date(movie.ngay_khoi_chieu).toLocaleDateString(
-                            "vi-VN",
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            },
-                          )
+                          "vi-VN",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          },
+                        )
                         : "Chưa cập nhật"}
                     </TableCell>
 
-                    {/* Điểm đánh giá dạng star glow */}
                     <TableCell className="text-center">
                       {movie.danh_gia ? (
-                        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
-                          ⭐ {movie.danh_gia}/10
-                        </div>
+                        <span className="inline-flex items-center gap-1 border border-[#e8c46a]/25 bg-[#e8c46a]/10 px-2.5 py-1 text-xs font-bold text-[#e8c46a]">
+                          ★ {movie.danh_gia}/10
+                        </span>
                       ) : (
-                        <span className="text-zinc-500 text-xs">N/A</span>
+                        <span className="text-xs text-white/30">N/A</span>
                       )}
                     </TableCell>
 
-                    {/* Trạng thái hiển thị theo badge pill border tinh tế giống ảnh mẫu */}
                     <TableCell className="text-right">
                       {movie.dang_chieu ? (
-                        <Badge className="rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-0.5 hover:bg-emerald-500/20">
-                          Đang chiếu
-                        </Badge>
+                        <StatusPill color="#8ff3c8" label="Đang chiếu" />
                       ) : movie.sap_chieu ? (
-                        <Badge className="rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/30 px-3 py-0.5 hover:bg-sky-500/20">
-                          Sắp chiếu
-                        </Badge>
+                        <StatusPill color="#63eaff" label="Sắp chiếu" />
                       ) : (
-                        <Badge className="rounded-full bg-transparent text-zinc-400 border border-white/10 px-3 py-0.5 hover:bg-white/5">
-                          Ngừng chiếu
-                        </Badge>
+                        <StatusPill color="#ffffff40" label="Ngừng chiếu" muted />
                       )}
                     </TableCell>
                   </TableRow>
@@ -209,9 +257,9 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center h-48 text-zinc-500"
+                    className="h-48 text-center text-white/40"
                   >
-                    Không có dữ liệu phim nào trên hệ thống.
+                    Chưa có phim nào trong danh sách này.
                   </TableCell>
                 </TableRow>
               )}
@@ -219,12 +267,14 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
           </Table>
         </div>
 
-        {/* 3. FOOTER (Cố định ở dưới) */}
-        <DialogFooter className="shrink-0 pt-4 border-t border-white/5">
+        <DialogFooter className="shrink-0 items-center justify-between gap-3 border-t border-white/10 px-7 py-4 sm:justify-between">
+          <p className="hidden text-xs font-light text-white/35 sm:block">
+            Nhấp vào một phim để xem chi tiết và đặt vé.
+          </p>
           <DialogClose asChild>
             <Button
               variant="outline"
-              className="border-white/10 bg-transparent hover:bg-white/10 text-white hover:text-white transition-colors"
+              className="border-white/12 bg-transparent text-white transition-colors hover:bg-white/10 hover:text-white"
             >
               Đóng bảng
             </Button>
@@ -232,5 +282,29 @@ export default function CircleRadiusBtn({ movies }: { movies: TMovie[] }) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+
+function StatusPill({
+  color,
+  label,
+  muted = false,
+}: {
+  color: string;
+  label: string;
+  muted?: boolean;
+}) {
+  return (
+    <span className="inline-flex items-center gap-2 text-xs font-medium tracking-wide">
+      <span
+        className="h-1.5 w-1.5 rounded-full"
+        style={{
+          background: color,
+          boxShadow: muted ? undefined : `0 0 8px ${color}`,
+        }}
+      />
+      <span className={muted ? "text-white/40" : "text-white/75"}>{label}</span>
+    </span>
   );
 }

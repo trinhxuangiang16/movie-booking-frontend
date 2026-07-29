@@ -28,7 +28,7 @@ export default function TitleSection({
       <div className="phim-hot-wrap flex">
         <h1 className={`${oswald.className} phim-hot-title`}>{titleList}</h1>
         {status !== "select" && status !== "promotion" && status !== "news" && (
-          <CircleRadiusBtn movies={movies ?? []} />
+          <CircleRadiusBtn movies={movies ?? []} status={status} />
         )}
       </div>
     </div>

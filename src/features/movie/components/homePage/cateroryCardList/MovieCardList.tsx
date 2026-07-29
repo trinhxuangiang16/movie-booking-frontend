@@ -94,9 +94,6 @@ export default function MovieCardList({
           </CarouselItem>
         ))}
       </CarouselContent>
-
-      {/* <CarouselPrevious />
-      <CarouselNext /> */}
     </Carousel>
   );
 }

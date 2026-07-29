@@ -12,11 +12,9 @@ export default function CinemaSystemSection() {
 
   return (
     <div className={`css-band relative z-10 -mt-8 ${oswald.className}`}>
-      {/* đường kẻ gold mảnh trên/dưới — nối ngôn ngữ với spotlight */}
       <span className="css-line css-line--top" aria-hidden />
 
       <div className="relative py-14">
-        {/* tiêu đề kẹp giữa 2 nét art-deco */}
         <div className="mb-10 flex items-center justify-center gap-5">
           <p className="text-center text-[11px] font-semibold uppercase tracking-[0.4em] text-white/60">
             Đồng hành cùng các cụm rạp uy tín toàn quốc

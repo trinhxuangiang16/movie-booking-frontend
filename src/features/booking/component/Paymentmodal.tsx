@@ -3,21 +3,18 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useOrderStatus } from "../hooks/useOrderStatus";
+import { useCancelOrder } from "@/features/movie/hooks/useCancelOrder";
+import { useSearchUser } from "@/features/auth/hooks/useSearchUser";
+import type { ISearchUserItem } from "@/features/auth/services/searchUser.service";
 import type { IPendingOrderResult } from "@/features/movie/services/booking";
 
-/*
-  Modal thanh toán: các cổng online phổ biến tại Việt Nam (giữ nguyên cho
-  đúng tinh thần demo — chọn phương thức không ảnh hưởng luồng thật).
-  Bấm "Xác nhận thanh toán" ở bất kỳ phương thức nào sẽ luôn đi qua cùng 1
-  luồng thật: tạo đơn chờ thanh toán → hiện QR VietQR → poll trạng thái tới
-  khi ngân hàng xác nhận (webhook) hoặc hết hạn giữ ghế.
-*/
+
 
 type PayMethod = {
   id: string;
   name: string;
   note: string;
-  mark: React.ReactNode; // chữ ký hiệu thay logo ngoài
+  mark: React.ReactNode;
   accent: string;
 };
 
@@ -72,17 +69,25 @@ type PaymentModalProps = {
   open: boolean;
   total: number;
   onClose: () => void;
-  // Tạo đơn chờ thanh toán qua API; resolve = trả về thông tin QR (cha
-  // chuyển sang màn hình QR), reject = hiện màn lỗi
+
   onConfirm: () => Promise<IPendingOrderResult>;
-  // Gọi khi đơn đã được webhook xác nhận thanh toán (trạng thái da_thanh_toan)
   onPaid?: () => void;
+
+  onCancelled?: () => void;
+
+  isAdmin?: boolean;
+
+  onGrant?: (emailKhach: string) => Promise<unknown>;
+
+  onGranted?: () => void;
 };
 
 const CUT =
   "[clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)]";
 
-// định dạng mm:ss cho đồng hồ đếm ngược tới het_han_luc
+
+const PAYMENT_GRACE_MS = 5000;
+
 function formatCountdown(ms: number) {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const m = Math.floor(totalSec / 60);
@@ -96,12 +101,32 @@ export function PaymentModal({
   onClose,
   onConfirm,
   onPaid,
+  onCancelled,
+  isAdmin = false,
+  onGrant,
+  onGranted,
 }: PaymentModalProps) {
   const [method, setMethod] = useState<string>("momo");
   const [phase, setPhase] = useState<Phase>("choose");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [order, setOrder] = useState<IPendingOrderResult | null>(null);
   const [remainingMs, setRemainingMs] = useState<number>(0);
+
+
+  const [khachChon, setKhachChon] = useState<ISearchUserItem | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [dangCapVe, setDangCapVe] = useState<boolean>(false);
+
+  const [debouncedKeyword, setDebouncedKeyword] = useState<string>("");
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedKeyword(searchKeyword), 300);
+    return () => clearTimeout(id);
+  }, [searchKeyword]);
+
+  const { data: ketQuaTimKiem = [], isFetching: dangTimKiem } =
+    useSearchUser(debouncedKeyword);
+
+  const { mutate: huyGiaoDich } = useCancelOrder();
 
   const orderStatus = useOrderStatus(order?.ma_hoa_don ?? null, {
     enabled: phase === "qr",
@@ -111,10 +136,7 @@ export function PaymentModal({
     },
   });
 
-  // đồng hồ đếm ngược tới het_han_luc, cập nhật mỗi giây khi đang ở màn QR.
-  // Việc chuyển sang phase "failed" khi hết giờ (hoặc backend báo het_han)
-  // được xử lý trong chính tick() — đây là callback của setInterval/timeout,
-  // không phải setState đồng bộ trong thân effect, nên không cascading-render.
+
   useEffect(() => {
     if (phase !== "qr" || !order) return;
 
@@ -126,7 +148,15 @@ export function PaymentModal({
 
       const backendExpired =
         orderStatus.data?.trang_thai_thanh_toan === "het_han";
-      if (remaining <= 0 || backendExpired) {
+
+      if (backendExpired) {
+        setErrorMsg("Đã hết thời gian giữ ghế. Vui lòng đặt lại vé.");
+        setPhase("failed");
+        return;
+      }
+
+
+      if (remaining <= -PAYMENT_GRACE_MS) {
         setErrorMsg("Đã hết thời gian giữ ghế. Vui lòng đặt lại vé.");
         setPhase("failed");
       }
@@ -135,19 +165,55 @@ export function PaymentModal({
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, order]);
+
+
+  const dangChoXacNhan =
+    phase === "qr" && remainingMs <= 0 && remainingMs > -PAYMENT_GRACE_MS;
 
   if (!open) return null;
 
-  // reset state khi đóng modal, để lần mở sau bắt đầu lại từ đầu
   const handleClose = () => {
+
+    if (phase === "failed") {
+      onCancelled?.();
+    }
+
     setPhase("choose");
     setMethod("momo");
+    setKhachChon(null);
+    setSearchKeyword("");
+    setDangCapVe(false);
     setErrorMsg(null);
     setOrder(null);
     setRemainingMs(0);
     onClose();
+  };
+
+
+  const handleCancel = () => {
+    if (!order) {
+      handleClose();
+      return;
+    }
+
+    huyGiaoDich(order.ma_hoa_don);
+
+    onCancelled?.();
+    handleClose();
+  };
+
+
+  const handleGrant = async () => {
+    if (!onGrant) return;
+    setDangCapVe(true);
+    try {
+      await onGrant(khachChon?.email?.trim() ?? "");
+      handleClose();
+      onGranted?.();
+    } catch {
+      setDangCapVe(false);
+    }
   };
 
   const confirm = async () => {
@@ -172,7 +238,6 @@ export function PaymentModal({
       aria-modal="true"
       aria-label="Thanh toán"
     >
-      {/* backdrop */}
       <div
         className="absolute inset-0 bg-[#04060f]/85 backdrop-blur-sm"
         onClick={
@@ -181,7 +246,6 @@ export function PaymentModal({
       />
 
       <div className="relative w-full max-w-md overflow-hidden bg-gradient-to-b from-[#0d1230] to-[#0a0e24] ring-1 ring-white/12 [clip-path:polygon(16px_0,100%_0,100%_calc(100%-16px),calc(100%-16px)_100%,0_100%,0_16px)]">
-        {/* răng phim mép trên */}
         <div
           className="h-4 w-full opacity-15"
           style={{
@@ -190,7 +254,158 @@ export function PaymentModal({
           }}
         />
 
-        {phase === "choose" && (
+        {phase === "choose" && isAdmin && (
+          <div className="px-7 pb-7 pt-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#ffb27a]">
+                  Chế độ quản trị
+                </p>
+                <p className="mt-2 text-2xl font-bold text-white tabular-nums">
+                  {total.toLocaleString("vi-VN")}đ
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={handleClose}
+                aria-label="Đóng"
+                variant="modalClose"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </Button>
+            </div>
+
+            <div className="mt-6 space-y-1.5">
+              <label
+                htmlFor="tim-khach"
+                className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/55"
+              >
+                Tài khoản khách nhận vé
+              </label>
+
+              {khachChon ? (
+                <div className="flex items-center justify-between gap-3 border border-[#63eaff]/40 bg-[#63eaff]/[.06] px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-white">
+                      {khachChon.ho_ten || "(không tên)"}
+                    </p>
+                    <p className="truncate text-xs text-white/50">
+                      {khachChon.email}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setKhachChon(null);
+                      setSearchKeyword("");
+                    }}
+                    className="shrink-0 text-[11px] font-bold uppercase tracking-widest text-[#ff88e1] hover:text-[#ff88e1]/80"
+                  >
+                    Bỏ chọn
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    id="tim-khach"
+                    type="text"
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    placeholder="Tìm theo tên hoặc email khách..."
+                    className="w-full border border-white/12 bg-white/[.03] px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-[#63eaff]/50 focus:outline-none"
+                  />
+
+                  {searchKeyword.trim().length >= 2 && (
+                    <div className="max-h-40 overflow-y-auto border border-white/10 bg-[#0a0e24]">
+                      {dangTimKiem && ketQuaTimKiem.length === 0 ? (
+                        <p className="px-3 py-2.5 text-xs text-white/40">
+                          Đang tìm...
+                        </p>
+                      ) : ketQuaTimKiem.length === 0 ? (
+                        <p className="px-3 py-2.5 text-xs text-white/40">
+                          Không tìm thấy khách phù hợp.
+                        </p>
+                      ) : (
+                        ketQuaTimKiem.map((kh) => (
+                          <button
+                            key={kh.tai_khoan}
+                            type="button"
+                            onClick={() => {
+                              setKhachChon(kh);
+                              setSearchKeyword("");
+                            }}
+                            className="flex w-full flex-col items-start border-b border-white/[.06] px-3 py-2 text-left last:border-b-0 hover:bg-white/[.04]"
+                          >
+                            <span className="truncate text-sm font-medium text-white">
+                              {kh.ho_ten || "(không tên)"}
+                            </span>
+                            <span className="truncate text-xs text-white/45">
+                              {kh.email}
+                            </span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+
+              <p className="text-[11px] font-light leading-relaxed text-white/40">
+                Chọn khách để cấp vé thẳng vào lịch sử của họ. Bỏ trống = cấp cho
+                chính admin.
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-2.5">
+              <Button
+                type="button"
+                onClick={handleGrant}
+                disabled={dangCapVe}
+                variant="payment"
+                className="disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <span className="relative z-10">
+                  {dangCapVe ? "Đang cấp vé..." : "Cấp Vé Lại cho User"}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                disabled
+                variant="payMethod"
+                className="cursor-not-allowed opacity-40"
+                title="Tính năng đang phát triển"
+              >
+                <span className="text-sm font-bold text-white">
+                  Voucher (Marketing)
+                </span>
+                <span className="ml-auto text-[10px] uppercase tracking-widest text-white/40">
+                  Sắp có
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleClose}
+                disabled={dangCapVe}
+                variant="payDismiss"
+                className="disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Hủy giao dịch
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {phase === "choose" && !isAdmin && (
           <div className="px-7 pb-7 pt-4">
             <div className="flex items-start justify-between">
               <div>
@@ -231,8 +446,8 @@ export function PaymentModal({
                     style={
                       active
                         ? {
-                            boxShadow: `inset 0 0 0 1px ${m.accent}90, 0 0 20px -6px ${m.accent}50`,
-                          }
+                          boxShadow: `inset 0 0 0 1px ${m.accent}90, 0 0 20px -6px ${m.accent}50`,
+                        }
                         : undefined
                     }
                   >
@@ -255,15 +470,14 @@ export function PaymentModal({
                       </span>
                     </span>
                     <span
-                      className={`ml-auto h-2.5 w-2.5 shrink-0 rounded-full transition-all ${
-                        active ? "" : "bg-white/15"
-                      }`}
+                      className={`ml-auto h-2.5 w-2.5 shrink-0 rounded-full transition-all ${active ? "" : "bg-white/15"
+                        }`}
                       style={
                         active
                           ? {
-                              background: m.accent,
-                              boxShadow: `0 0 10px ${m.accent}`,
-                            }
+                            background: m.accent,
+                            boxShadow: `0 0 10px ${m.accent}`,
+                          }
                           : undefined
                       }
                     />
@@ -289,7 +503,6 @@ export function PaymentModal({
 
         {phase === "processing" && (
           <div className="flex flex-col items-center px-7 pb-12 pt-10">
-            {/* vòng quay cuộn phim */}
             <div className="relative h-16 w-16">
               <span className="absolute inset-0 animate-spin rounded-full border-2 border-white/10 border-t-[#63eaff]" />
               <span className="absolute inset-2.5 animate-[spin_1.6s_linear_infinite_reverse] rounded-full border-2 border-white/10 border-b-[#ff88e1]" />
@@ -313,7 +526,6 @@ export function PaymentModal({
             </p>
 
             <span className="mt-5 inline-block rounded-lg bg-white p-2.5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={order.qr_url}
                 alt="Mã QR VietQR để chuyển khoản thanh toán"
@@ -336,20 +548,35 @@ export function PaymentModal({
               </p>
             </div>
 
-            <p className="mt-5 text-sm font-bold uppercase tracking-[0.2em] text-white/80">
-              Còn lại{" "}
-              <span className="text-[#ff88e1] tabular-nums">
-                {formatCountdown(remainingMs)}
-              </span>
-            </p>
-            <p className="mt-2 flex items-center gap-2 text-xs font-light tracking-wide text-white/45">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#63eaff]" />
-              Đang chờ xác nhận thanh toán từ ngân hàng...
-            </p>
+            {dangChoXacNhan ? (
+
+              <>
+                <p className="mt-5 flex items-center gap-2.5 text-sm font-bold uppercase tracking-[0.2em] text-[#63eaff]">
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[#63eaff]/25 border-t-[#63eaff]" />
+                  Đang xác nhận lần cuối
+                </p>
+                <p className="mt-2 text-xs font-light tracking-wide text-white/45">
+                  Vui lòng đợi trong giây lát, đừng đóng cửa sổ...
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-5 text-sm font-bold uppercase tracking-[0.2em] text-white/80">
+                  Còn lại{" "}
+                  <span className="text-[#ff88e1] tabular-nums">
+                    {formatCountdown(remainingMs)}
+                  </span>
+                </p>
+                <p className="mt-2 flex items-center gap-2 text-xs font-light tracking-wide text-white/45">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#63eaff]" />
+                  Đang chờ xác nhận thanh toán từ ngân hàng...
+                </p>
+              </>
+            )}
 
             <Button
               type="button"
-              onClick={handleClose}
+              onClick={handleCancel}
               variant="payDismiss"
               className="mt-6 w-full"
             >
@@ -408,28 +635,20 @@ export function PaymentModal({
               {errorMsg ??
                 "Giao dịch bị từ chối bởi cổng thanh toán. Kiểm tra lại thông tin hoặc chọn phương thức khác."}
             </p>
-            <div className="mt-6 flex w-full gap-3">
+
+            <div className="mt-6 flex w-full">
               <Button
                 type="button"
-                onClick={() => {
-                  // đơn cũ (nếu có) đã hết hạn/lỗi — bỏ hẳn để tránh poll nhầm
-                  setOrder(null);
-                  setRemainingMs(0);
-                  setErrorMsg(null);
-                  setPhase("choose");
-                }}
-                variant="payRetry"
+                onClick={handleClose}
+                variant="payDismiss"
+                className="w-full"
               >
-                Thử lại
-              </Button>
-              <Button type="button" onClick={handleClose} variant="payDismiss">
                 Đóng
               </Button>
             </div>
           </div>
         )}
 
-        {/* răng phim mép dưới */}
         <div
           className="h-4 w-full opacity-15"
           style={{

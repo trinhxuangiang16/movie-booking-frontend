@@ -24,16 +24,13 @@ export function SystemLogo() {
     number | undefined
   >();
 
-  //  DATA FETCHING — gọi API
   const { data: systemTheaters } = useTheaterSystem();
 
-  // Chưa chọn hệ thống rạp thì mặc định lấy hệ thống đầu tiên
   const activeTheater = selectedTheater ?? systemTheaters?.[0]?.ma_he_thong_rap;
 
   const { data: findTheaterToSchedule, isLoading: isLoadingSchedule } =
     useGetSchedule(activeTheater);
 
-  // Cụm rạp của hệ thống đang chọn
   const cumRapList: ITheaterGroup[] = Array.isArray(findTheaterToSchedule)
     ? findTheaterToSchedule
     : [];
@@ -84,6 +81,9 @@ export function SystemLogo() {
   const cardActive =
     "bg-[linear-gradient(90deg,rgba(99,234,255,.16),rgba(99,234,255,.04)_55%,rgba(255,136,225,.07))] text-[#7fefff] ring-[#63eaff]/60 shadow-[inset_3px_0_0_0_#63eaff,inset_0_0_24px_-8px_rgba(99,234,255,.45)] hover:text-[#7fefff] hover:ring-[#63eaff]/60 hover:shadow-[inset_3px_0_0_0_#63eaff,inset_0_0_24px_-8px_rgba(99,234,255,.45)]";
 
+  const columnClass =
+    "bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6 h-[632px] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full";
+
   return (
     <div className="relative py-20">
       <Tabs
@@ -127,15 +127,13 @@ export function SystemLogo() {
         >
           {isLoadingSchedule && <p>Loading schedule...</p>}
 
-          <div className="cum-rap w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+          <div className={`cum-rap w-1/5 ${columnClass}`}>
             {cumRapList.map((item) => (
               <Card
                 key={item.ma_cum_rap}
-                className={`${cardBase} ${
-                  activeCumRap?.ma_cum_rap === item.ma_cum_rap && cardActive
-                }`}
+                className={`${cardBase} ${activeCumRap?.ma_cum_rap === item.ma_cum_rap && cardActive
+                  }`}
                 onClick={() => {
-                  // Đổi cụm rạp → reset rạp/phim/ngày để fallback về mặc định
                   setSelectedCumRap(item.ma_cum_rap);
                   setSelectedRap(undefined);
                   setSelectedMovie(undefined);
@@ -151,16 +149,14 @@ export function SystemLogo() {
             ))}
           </div>
 
-          <div className="rap-phim w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+          <div className={`rap-phim w-1/5 ${columnClass}`}>
             {activeCumRap?.RapPhim.map((item: ITheater) => {
               return (
                 <Card
                   key={item.ma_rap}
-                  className={`${cardBase} ${
-                    activeRap?.ma_rap === item.ma_rap && cardActive
-                  }`}
+                  className={`${cardBase} ${activeRap?.ma_rap === item.ma_rap && cardActive
+                    }`}
                   onClick={() => {
-                    // Đổi rạp → reset phim/ngày
                     setSelectedRap(item.ma_rap);
                     setSelectedMovie(undefined);
                     setSelectedDate(undefined);
@@ -180,17 +176,15 @@ export function SystemLogo() {
             })}
           </div>
 
-          <div className="movies w-2/9 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+          <div className={`movies w-2/9 ${columnClass}`}>
             {movies.map(
               (movie) =>
                 movie && (
                   <Card
                     key={movie.ma_phim}
-                    className={`${cardBase} ${
-                      activeMovie === movie.ma_phim && cardActive
-                    }`}
+                    className={`${cardBase} ${activeMovie === movie.ma_phim && cardActive
+                      }`}
                     onClick={() => {
-                      // Đổi phim → reset ngày
                       setSelectedMovie(movie.ma_phim);
                       setSelectedDate(undefined);
                     }}
@@ -205,7 +199,7 @@ export function SystemLogo() {
             )}
           </div>
 
-          <div className="dates w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+          <div className={`dates w-1/5 ${columnClass}`}>
             {uniqueDates.map((date) => (
               <Card
                 key={date}
@@ -221,13 +215,12 @@ export function SystemLogo() {
             ))}
           </div>
 
-          <div className="times w-1/5 bg-transparent flex flex-col gap-10 px-6 py-6 border-r border-white/20 pr-6">
+          <div className={`times w-1/5 ${columnClass}`}>
             {showTimes.map((item) => (
               <Card
                 key={item.ma_lich_chieu}
-                className={`${cardBase} text-white/90 ring-[#ff88e1]/25 hover:bg-[linear-gradient(90deg,#63eaff,#ff88e1)] hover:text-[#06101c] hover:ring-transparent hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,.25)] ${
-                  selectedLichChieu === item.ma_lich_chieu && cardActive
-                }`}
+                className={`${cardBase} text-white/90 ring-[#ff88e1]/25 hover:bg-[linear-gradient(90deg,#63eaff,#ff88e1)] hover:text-[#06101c] hover:ring-transparent hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,.25)] ${selectedLichChieu === item.ma_lich_chieu && cardActive
+                  }`}
                 onClick={() => {
                   setSelectedLichChieu(item.ma_lich_chieu);
                   router.push(

@@ -9,7 +9,6 @@ export interface ICombo {
 }
 
 export const comboService = {
-  // Danh sách combo bắp nước đang bán (public, không cần token)
   getDanhSachComboService: async (): Promise<ICombo[]> => {
     const res = await api.get(`Combo/DanhSachCombo`);
     return res.data?.data;

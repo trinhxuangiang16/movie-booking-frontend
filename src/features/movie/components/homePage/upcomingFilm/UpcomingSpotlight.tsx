@@ -44,7 +44,6 @@ const UpcomingSpotlight: React.FC = () => {
           loading="lazy"
         />
 
-        {/* Tấm kính mờ che chữ bên trái ảnh */}
         <div className="ucs__glass" aria-hidden />
         <div className="ucs__veil" aria-hidden />
         <div className="ucs__beam" aria-hidden />

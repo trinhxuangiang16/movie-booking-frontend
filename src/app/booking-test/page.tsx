@@ -9,14 +9,21 @@ import { Button } from "@/components/ui/button";
 import { SeatMap } from "@/features/booking/component/SeatMap";
 import { ExtraServices } from "@/features/booking/component/Extraservices";
 import { useCombo } from "@/features/booking/hooks/useCombo";
+import { useSeatHold } from "@/features/booking/hooks/useSeatHold";
+import { errorToast } from "@/components/ui/toastStatus";
 import { TotalServicePayment } from "@/features/booking/component/Totalservicepayment";
 import { PaymentModal } from "@/features/booking/component/Paymentmodal";
 import { buildSeatMap } from "@/features/booking/utils/seatMap.utils";
 import { useGetScheduleByMovieId } from "@/features/movie/hooks/useGetSchedule";
 import { useStatusTheater } from "@/features/movie/hooks/useStatusTheater";
 import { useBooking } from "@/features/movie/hooks/useBooking";
+import { useGrantTicket } from "@/features/movie/hooks/useGrantTicket";
+import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 import { historyPaymentService } from "@/features/booking/services/historyPayment";
 import Link from "next/link";
+
+
+const MAX_SEATS = 8;
 
 const SEAT_TYPE_LABEL: Record<string, string> = {
   normal: "Thường",
@@ -30,7 +37,6 @@ const CUT_PANEL =
 const PAGE_BG =
   "relative min-h-screen w-full bg-[#0c1137] bg-[url('https://www.transparenttextures.com/patterns/batthern.png')] pt-[80px]";
 
-// vd: "19:00, Thứ Năm ngày 20/08/2026"
 function formatShowtime(iso: string) {
   const d = new Date(iso);
   const time = d.toLocaleTimeString("vi-VN", {
@@ -63,6 +69,10 @@ function BookingSeatSelection() {
     useStatusTheater(maLichChieu);
   const { data: combos = [] } = useCombo();
   const { mutateAsync: datVe } = useBooking();
+  const { mutateAsync: capVe } = useGrantTicket();
+  const { isAdmin } = useCurrentUser();
+  const { giuGhe, nhaGhe, khoiPhucGhe, danhDauDaTaoDon, resetSauKhiHuyDon } =
+    useSeatHold(maLichChieu);
 
   const seatMap = useMemo(
     () => buildSeatMap(seatStatus?.danh_sach_ghe ?? []),
@@ -79,8 +89,28 @@ function BookingSeatSelection() {
   const [downloading, setDownloading] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
 
-  // Sau khi webhook xác nhận thanh toán (phase "success" của PaymentModal),
-  // vé thật đã tồn tại — lấy mã QR check-in từ lịch sử đặt vé (đơn vừa chốt).
+  const [daKhoiPhuc, setDaKhoiPhuc] = useState<number | null>(null);
+
+  if (
+    maLichChieu &&
+    seatStatus &&
+    daKhoiPhuc !== maLichChieu &&
+    seatStatus.ma_lich_chieu === maLichChieu
+  ) {
+    setDaKhoiPhuc(maLichChieu);
+
+
+    const gheCuaToi = seatStatus.danh_sach_ghe
+      .filter((s) => s.la_cua_toi && s.loai_giu_cho === "tam")
+      .map((s) => s.ma_ghe);
+
+    if (gheCuaToi.length > 0) {
+      setSelectedSeats(gheCuaToi);
+      khoiPhucGhe(gheCuaToi);
+    }
+  }
+
+
   const handlePaid = useCallback(async () => {
     if (!pendingHoaDon) return;
     try {
@@ -112,7 +142,6 @@ function BookingSeatSelection() {
 
   const giaVe = schedule?.gia_ve ?? 0;
 
-  // Hệ số VIP 1.2 phải khớp với cách backend tính tiền khi đặt vé (datVe.service.js)
   const priceByType = useMemo(
     () => ({
       normal: giaVe,
@@ -122,13 +151,29 @@ function BookingSeatSelection() {
     [giaVe],
   );
 
-  const toggleSeat = useCallback((ma_ghe: number) => {
-    setSelectedSeats((prev) => {
-      if (prev.includes(ma_ghe)) return prev.filter((id) => id !== ma_ghe);
-      if (prev.length < 8) return [...prev, ma_ghe];
-      return prev;
-    });
-  }, []);
+
+  const toggleSeat = useCallback(
+    async (ma_ghe: number) => {
+      if (selectedSeats.includes(ma_ghe)) {
+        setSelectedSeats((prev) => prev.filter((id) => id !== ma_ghe));
+        nhaGhe(ma_ghe);
+        return;
+      }
+
+      if (selectedSeats.length >= MAX_SEATS) {
+        errorToast(`Mỗi lượt đặt chỉ được chọn tối đa ${MAX_SEATS} ghế`);
+        return;
+      }
+
+      const giuDuoc = await giuGhe(ma_ghe);
+      if (giuDuoc) {
+        setSelectedSeats((prev) =>
+          prev.includes(ma_ghe) ? prev : [...prev, ma_ghe],
+        );
+      }
+    },
+    [selectedSeats, giuGhe, nhaGhe],
+  );
 
   const chosenSeats = useMemo(
     () => allSeats.filter((s) => selectedSeats.includes(s.ma_ghe)),
@@ -162,6 +207,17 @@ function BookingSeatSelection() {
       seatLines.reduce((a, l) => a + l.amount, 0) +
       serviceLines.reduce((a, l) => a + l.amount, 0),
     [seatLines, serviceLines],
+  );
+
+  const comboPayload = useCallback(
+    () =>
+      Object.entries(serviceQty)
+        .filter(([, qty]) => qty > 0)
+        .map(([ma_combo, so_luong]) => ({
+          ma_combo: Number(ma_combo),
+          so_luong,
+        })),
+    [serviceQty],
   );
 
   if (!maLichChieu) {
@@ -211,7 +267,6 @@ function BookingSeatSelection() {
   const cinema = schedule.RapPhim.CumRap.ten_cum_rap;
   const showtime = formatShowtime(schedule.ngay_gio_chieu);
 
-  /* ── MÀN HÌNH THÀNH CÔNG: vé xác nhận thay toàn bộ nội dung ── */
   if (purchased) {
     return (
       <div className={PAGE_BG}>
@@ -253,7 +308,6 @@ function BookingSeatSelection() {
                 </p>
               </div>
 
-              {/* đường xé */}
               <div className="relative my-3 h-5">
                 <span className="absolute left-0 top-1/2 h-5 w-2.5 -translate-y-1/2 rounded-r-full bg-[#070a1c]" />
                 <span className="absolute right-0 top-1/2 h-5 w-2.5 -translate-y-1/2 rounded-l-full bg-[#070a1c]" />
@@ -360,12 +414,10 @@ function BookingSeatSelection() {
     );
   }
 
-  /* ── MÀN HÌNH CHỌN GHẾ + DỊCH VỤ ── */
   return (
     <div className={PAGE_BG}>
       <div className={`px-4 pb-20 pt-10 md:px-8 ${oswald.className}`}>
         <div className="mx-auto w-full max-w-7xl">
-          {/* tiêu đề trang */}
           <div className="mb-8 flex items-center gap-4">
             <span className="h-9 w-[3px] rounded-full bg-gradient-to-b from-[#ff88e1] to-[#63eaff]" />
             <div>
@@ -383,7 +435,6 @@ function BookingSeatSelection() {
           </div>
 
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-            {/* CỘT TRÁI: sơ đồ ghế + dịch vụ */}
             <div className="flex flex-col gap-8">
               <section
                 className={`bg-[#0a0e24]/70 p-8 ring-1 ring-white/[.08] backdrop-blur-[2px] ${CUT_PANEL}`}
@@ -414,7 +465,6 @@ function BookingSeatSelection() {
               </section>
             </div>
 
-            {/* CỘT PHẢI: hoá đơn dính */}
             <div className="lg:sticky lg:top-24">
               <TotalServicePayment
                 movieTitle={movieTitle}
@@ -433,14 +483,10 @@ function BookingSeatSelection() {
         <PaymentModal
           open={payOpen}
           total={total}
+          isAdmin={isAdmin}
           onClose={() => setPayOpen(false)}
           onConfirm={async () => {
-            const danh_sach_combo = Object.entries(serviceQty)
-              .filter(([, qty]) => qty > 0)
-              .map(([ma_combo, so_luong]) => ({
-                ma_combo: Number(ma_combo),
-                so_luong,
-              }));
+            const danh_sach_combo = comboPayload();
 
             const result = await datVe({
               ma_lich_chieu: maLichChieu,
@@ -448,9 +494,30 @@ function BookingSeatSelection() {
               ...(danh_sach_combo.length > 0 && { danh_sach_combo }),
             });
             setPendingHoaDon(result.ma_hoa_don);
+
+            danhDauDaTaoDon();
             return result;
           }}
           onPaid={handlePaid}
+          onCancelled={() => {
+
+            resetSauKhiHuyDon();
+            setSelectedSeats([]);
+          }}
+
+          onGrant={async (emailKhach) => {
+            const danh_sach_combo = comboPayload();
+            return capVe({
+              ma_lich_chieu: maLichChieu,
+              danh_sach_ve: selectedSeats.map((ma_ghe) => ({ ma_ghe })),
+              ...(danh_sach_combo.length > 0 && { danh_sach_combo }),
+              ...(emailKhach && { email_khach: emailKhach }),
+            });
+          }}
+          onGranted={() => {
+            setSelectedSeats([]);
+            setServiceQty({});
+          }}
         />
       </div>
     </div>
@@ -458,7 +525,6 @@ function BookingSeatSelection() {
 }
 
 export default function BookingSeatSelectionPage() {
-  // useSearchParams bắt buộc nằm trong Suspense boundary khi build production
   return (
     <Suspense
       fallback={

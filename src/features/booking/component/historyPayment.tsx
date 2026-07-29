@@ -8,11 +8,7 @@ import { useHistoryPayment } from "../hooks/usehistoryPayment";
 import { getSeatType } from "../utils/seatMap.utils";
 import type { IHistoryPayment } from "../services/historyPayment";
 
-/*
-  Lịch sử đặt vé theo giao dịch: mỗi hoá đơn là 1 "vé xé" (ticket stub),
-  đường dashed + 2 notch tròn giả lập vé rạp. Depth bằng chênh lệch nền
-  và border 1px #2a2f55, không glassmorphism, không glow.
-*/
+
 
 const PAGE_BG =
   "relative min-h-screen w-full bg-[#0c1137] bg-[url('http://www.transparenttextures.com/patterns/batthern.png')]";
@@ -25,7 +21,6 @@ const SEAT_CHIP: Record<string, string> = {
 
 type FilterTab = "all" | "thisMonth";
 
-// vd: "07:00, Thứ Năm ngày 1/10/2026"
 function formatShowtime(iso: string) {
   const d = new Date(iso);
   const time = d.toLocaleTimeString("vi-VN", {
@@ -36,7 +31,6 @@ function formatShowtime(iso: string) {
   return `${time}, ${weekday} ngày ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 }
 
-// vd: "20:31 ngày 17/7/2026"
 function formatCreatedAt(iso: string) {
   const d = new Date(iso);
   const time = d.toLocaleTimeString("vi-VN", {
@@ -50,7 +44,6 @@ function formatMoney(n: number) {
   return `${n.toLocaleString("vi-VN")}đ`;
 }
 
-/* ── Notch tròn khoét 2 đầu đường dashed ── */
 function Notch({ className }: { className: string }) {
   return (
     <span
@@ -60,7 +53,6 @@ function Notch({ className }: { className: string }) {
   );
 }
 
-/* ── 1 hoá đơn = 1 ticket stub ── */
 function TicketCard({ bill }: { bill: IHistoryPayment }) {
   const [open, setOpen] = useState(false);
 
@@ -70,9 +62,7 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
       className="group relative cursor-pointer rounded-2xl border border-[#2a2f55] bg-[#0a0e24] transition-all duration-200 hover:-translate-y-[2px] hover:border-[#454b7d] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <div className="md:grid md:grid-cols-[minmax(0,1fr)_auto_300px] md:items-stretch">
-        {/* ── PHẦN TRÁI: 3 cột — text | QR | badge (luôn hiện) ── */}
         <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:justify-between md:p-7">
-          {/* cột 1: tên phim, rạp/giờ, meta */}
           <div className="min-w-0 sm:flex-1">
             <h3 className="truncate text-xl font-bold text-[#e8eaf6] md:text-2xl">
               {bill.ten_phim}
@@ -88,7 +78,6 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
             </p>
           </div>
 
-          {/* cột 2: QR */}
           {bill.ma_ve_qr && (
             <div
               className="flex shrink-0 flex-col items-center gap-2 sm:mx-4"
@@ -108,7 +97,6 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
             </div>
           )}
 
-          {/* cột 3: badge mã hóa đơn + đặt lúc */}
           <div className="shrink-0 text-left sm:text-right">
             <span className="inline-block rounded border border-[#c22f4e]/50 px-2 py-0.5 text-xs font-bold tracking-wider text-[#e05658]">
               #{bill.ma_hoa_don}
@@ -119,7 +107,6 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
           </div>
         </div>
 
-        {/* ── ĐƯỜNG XÉ dọc (desktop) ── */}
         <div className="relative hidden md:block">
           <Notch className="-top-2.5 left-1/2 -translate-x-1/2" />
           <Notch className="-bottom-2.5 left-1/2 -translate-x-1/2" />
@@ -134,7 +121,6 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
           <span className="block w-8" />
         </div>
 
-        {/* ── ĐƯỜNG XÉ ngang (mobile) ── */}
         <div className="relative h-8 md:hidden">
           <Notch className="-left-2.5 top-1/2 -translate-y-1/2" />
           <Notch className="-right-2.5 top-1/2 -translate-y-1/2" />
@@ -148,13 +134,10 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
           />
         </div>
 
-        {/* ── PHẦN PHẢI: chi tiết ── */}
         <div className="flex flex-col px-6 pb-6 md:py-7 md:pl-0 md:pr-7">
-          {/* khối mở rộng: ghế + combo */}
           <div
-            className={`overflow-hidden transition-[max-height,opacity] duration-300 motion-reduce:transition-none ${
-              open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-            }`}
+            className={`overflow-hidden transition-[max-height,opacity] duration-300 motion-reduce:transition-none ${open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+              }`}
           >
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8b90b5]">
               Ghế
@@ -163,9 +146,8 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
               {bill.ghe.map((g) => (
                 <span
                   key={g.ma_ghe}
-                  className={`inline-flex items-baseline gap-1.5 rounded border px-2 py-1 text-xs font-semibold ${
-                    SEAT_CHIP[getSeatType(g.loai_ghe)]
-                  }`}
+                  className={`inline-flex items-baseline gap-1.5 rounded border px-2 py-1 text-xs font-semibold ${SEAT_CHIP[getSeatType(g.loai_ghe)]
+                    }`}
                 >
                   {g.ten_ghe}
                   <span className="text-[10px] font-light text-[#8b90b5]">
@@ -202,7 +184,6 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
             <span className="mb-4 mt-4 block h-px w-full bg-[#2a2f55]" />
           </div>
 
-          {/* tổng cộng: luôn hiện */}
           <div className="mt-auto flex items-end justify-between gap-3">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8b90b5]">
@@ -229,9 +210,8 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                className={`size-4 transition-transform duration-200 motion-reduce:transition-none ${
-                  open ? "rotate-180" : ""
-                }`}
+                className={`size-4 transition-transform duration-200 motion-reduce:transition-none ${open ? "rotate-180" : ""
+                  }`}
               >
                 <path d="M6 9l6 6 6-6" />
               </svg>
@@ -243,7 +223,6 @@ function TicketCard({ bill }: { bill: IHistoryPayment }) {
   );
 }
 
-/* ── Skeleton shimmer theo khung ticket ── */
 function TicketSkeleton() {
   return (
     <div className="animate-pulse rounded-2xl border border-[#2a2f55] bg-[#0a0e24]">
@@ -263,7 +242,6 @@ function TicketSkeleton() {
   );
 }
 
-/* ── Empty state ── */
 function EmptyHistory() {
   return (
     <div className="flex flex-col items-center gap-6 rounded-2xl border border-[#2a2f55] bg-[#0a0e24] px-6 py-16 text-center">
@@ -294,7 +272,6 @@ function EmptyHistory() {
   );
 }
 
-/* ── Trang lịch sử đặt vé ── */
 export default function HistoryPayment() {
   const { data: bills, isLoading, isError, refetch } = useHistoryPayment();
   const [tab, setTab] = useState<FilterTab>("all");
@@ -318,7 +295,6 @@ export default function HistoryPayment() {
   return (
     <div className={PAGE_BG}>
       <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-28 md:px-8">
-        {/* tiêu đề trang */}
         <div className="flex items-center gap-4">
           <span className="h-10 w-[3px] rounded-full bg-[#c22f4e]" />
           <h1 className="text-2xl font-bold uppercase tracking-widest text-[#e05658] md:text-3xl">
@@ -329,7 +305,6 @@ export default function HistoryPayment() {
           Mỗi vé là một giao dịch đã hoàn tất
         </p>
 
-        {/* filter tab underline */}
         <div className="mt-8 flex gap-2 border-b border-[#2a2f55]">
           {(
             [
@@ -342,18 +317,16 @@ export default function HistoryPayment() {
               type="button"
               variant="ghost"
               onClick={() => setTab(t.key)}
-              className={`-mb-px rounded-none border-0 border-b-2 px-4 pb-3 pt-2 text-xs font-bold uppercase tracking-[0.2em] hover:bg-transparent ${
-                tab === t.key
-                  ? "border-b-[#c22f4e] text-[#e8eaf6]"
-                  : "border-b-transparent text-[#8b90b5] hover:text-[#e8eaf6]"
-              }`}
+              className={`-mb-px rounded-none border-0 border-b-2 px-4 pb-3 pt-2 text-xs font-bold uppercase tracking-[0.2em] hover:bg-transparent ${tab === t.key
+                ? "border-b-[#c22f4e] text-[#e8eaf6]"
+                : "border-b-transparent text-[#8b90b5] hover:text-[#e8eaf6]"
+                }`}
             >
               {t.label}
             </Button>
           ))}
         </div>
 
-        {/* danh sách hoá đơn */}
         <div className="mt-8 flex flex-col gap-6">
           {isLoading ? (
             <>

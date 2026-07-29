@@ -23,11 +23,9 @@ export default function NewsletterSection() {
 
   return (
     <div className={`relative pt-16 ${oswald.className}`}>
-      {/* bg trong suốt — chỉ 1 vũng tối elip cục bộ sau chữ để chữ bạc không chìm vào chữ MOVI.E của nền chung */}
       <div className="relative px-8 py-24 text-center">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(46%_62%_at_50%_45%,rgba(4,6,18,.8),rgba(4,6,18,.3)_58%,transparent_88%)]" />
 
-        {/* 2 tia sáng chéo kiểu đèn premiere, rất mờ */}
         <div className="nls-ray nls-ray--l pointer-events-none absolute inset-0" />
         <div className="nls-ray nls-ray--r pointer-events-none absolute inset-0" />
 
@@ -36,7 +34,6 @@ export default function NewsletterSection() {
             Bắt đầu ngay hôm nay
           </p>
 
-          {/* tiêu đề bạc + lớp shine quét qua định kỳ */}
           <h2 className="nls-title relative mx-auto mt-4 w-fit text-4xl font-bold leading-[1.3] tracking-wide sm:text-6xl">
             <span className="bg-gradient-to-b from-[#4a4f66] via-[#eef1f8] to-[#383d55] bg-clip-text text-transparent">
               ĐỪNG BỎ LỠ SUẤT CHIẾU HOT
@@ -53,7 +50,6 @@ export default function NewsletterSection() {
             kiện điện ảnh sớm nhất.
           </p>
 
-          {/* form vé: vát góc thay bo tròn, viền gradient bạc→cyan khi focus */}
           <form
             onSubmit={handleSubmit}
             className="nls-form mx-auto mt-10 max-w-lg"

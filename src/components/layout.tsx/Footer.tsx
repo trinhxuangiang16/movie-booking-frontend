@@ -1,4 +1,3 @@
-// components/Footer.tsx
 "use client";
 
 import Link from "next/link";
@@ -9,8 +8,13 @@ import {
   HiOutlineLocationMarker,
 } from "react-icons/hi";
 import { bebas, oswald } from "@/lib";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isAuthPage =
+    pathname.startsWith("/login") || pathname.startsWith("/register");
+
   const cinemas = [
     "CGV Cinemas",
     "BHD Star Cineplex",
@@ -38,6 +42,8 @@ export default function Footer() {
     { icon: FaInstagram, href: "#", label: "Instagram" },
   ];
 
+  if (isAuthPage) return null;
+
   return (
     <footer
       className={`relative overflow-hidden bg-[#001029] ${oswald.className}`}
@@ -46,20 +52,16 @@ export default function Footer() {
           "url('https://www.transparenttextures.com/patterns/dark-brick-wall.png')",
       }}
     >
-      {/* glow trang trí */}
       <div className="pointer-events-none absolute -top-40 left-1/4 h-80 w-80 rounded-full bg-[#97dde8]/10 blur-[120px]" />
       <div className="pointer-events-none absolute -top-20 right-1/4 h-80 w-80 rounded-full bg-[#ffccf2]/10 blur-[120px]" />
 
-      {/* film strip trên cùng */}
       <div className="relative h-6 w-full bg-black">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#97dde8] to-transparent" />
         <div className="film-strip-track absolute inset-x-0 top-1.5 h-3 [background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.55)_0_10px,transparent_10px_26px)] [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]" />
       </div>
 
       <div className="relative mx-auto max-w-[1400px] px-8 pb-6 pt-12 lg:px-12">
-        {/* HÀNG CHÍNH: brand | links x2 | liên hệ */}
         <div className="grid grid-cols-1 gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
-          {/* BRAND */}
           <div>
             <Link href="/" className="footer-logo group">
               <p className={bebas.className}>Movi</p>
@@ -71,7 +73,6 @@ export default function Footer() {
               ngày.
             </p>
 
-            {/* social + trạng thái hỗ trợ gộp 1 hàng */}
             <div className="mt-5 flex items-center gap-3">
               {socials.map(({ icon: Icon, href, label }) => (
                 <a
@@ -93,7 +94,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* VỀ MOVI.E */}
           <nav aria-label="Về Movi.E">
             <h4 className="relative pl-3 text-sm font-bold uppercase tracking-[0.15em] text-white">
               <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-[#ffccf2] to-[#97dde8]" />
@@ -114,7 +114,6 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* HỖ TRỢ */}
           <nav aria-label="Hỗ trợ">
             <h4 className="relative pl-3 text-sm font-bold uppercase tracking-[0.15em] text-white">
               <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-[#ffccf2] to-[#97dde8]" />
@@ -135,7 +134,6 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* LIÊN HỆ */}
           <div>
             <h4 className="relative pl-3 text-sm font-bold uppercase tracking-[0.15em] text-white">
               <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-[#ffccf2] to-[#97dde8]" />
@@ -165,7 +163,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* BOTTOM: đối tác + copyright + legal gộp 1 hàng */}
         <div className="mt-10 flex flex-col gap-4 border-t border-white/[0.07] pt-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">
@@ -197,7 +194,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* film strip đáy */}
       <div className="relative h-6 w-full bg-black">
         <div className="film-strip-track absolute inset-x-0 top-1.5 h-3 [background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.35)_0_10px,transparent_10px_26px)] [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]" />
       </div>

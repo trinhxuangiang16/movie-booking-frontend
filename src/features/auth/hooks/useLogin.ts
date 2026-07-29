@@ -16,10 +16,30 @@ export const useLogin = () => {
         sameSite: "lax",
       });
 
-      // Dùng window.location thay vì router.push()
+      const refreshToken = data?.token?.refreshToken;
+      setCookie("refreshToken", refreshToken, {
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: false,
+        sameSite: "lax",
+      });
+
+
+      if (data?.user) {
+        setCookie("user", JSON.stringify(data.user), {
+          maxAge: 60 * 60 * 24 * 7,
+          httpOnly: false,
+          sameSite: "lax",
+        });
+
+        if (data.user.email) {
+          localStorage.setItem("userEmail", data.user.email);
+        }
+      }
+
+
       setTimeout(() => {
         window.location.href = "/";
-      }, 500);
+      }, 500); //
     },
     onError: () => errorToast("Đăng nhập thất bại!"),
   });

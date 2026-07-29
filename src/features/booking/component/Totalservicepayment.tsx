@@ -2,10 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-/*
-  Hoá đơn kiểu vé rạp: đầu vé thông tin suất chiếu,
-  đường xé răng cưa, thân vé liệt kê ghế + dịch vụ, chân vé tổng tiền
-*/
+
 
 type TInvoiceLine = { label: string; detail?: string; amount: number };
 
@@ -35,7 +32,6 @@ export function TotalServicePayment({
   return (
     <aside className="relative">
       <div className="relative overflow-hidden bg-gradient-to-b from-[#0d1230] to-[#0a0e24] ring-1 ring-white/10 [clip-path:polygon(14px_0,100%_0,100%_calc(100%-14px),calc(100%-14px)_100%,0_100%,0_14px)]">
-        {/* ĐẦU VÉ */}
         <div className="relative px-6 pb-5 pt-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#63eaff]">
             Hoá đơn đặt vé
@@ -48,7 +44,6 @@ export function TotalServicePayment({
           </p>
         </div>
 
-        {/* ĐƯỜNG XÉ răng cưa + 2 lỗ tròn */}
         <div className="relative h-5">
           <span className="absolute left-0 top-1/2 h-5 w-2.5 -translate-y-1/2 rounded-r-full bg-[#070a1c]" />
           <span className="absolute right-0 top-1/2 h-5 w-2.5 -translate-y-1/2 rounded-l-full bg-[#070a1c]" />
@@ -61,7 +56,6 @@ export function TotalServicePayment({
           />
         </div>
 
-        {/* THÂN VÉ */}
         <div className="max-h-[300px] overflow-y-auto px-6 py-4 [scrollbar-width:thin]">
           {empty ? (
             <p className="py-6 text-center text-sm font-light text-white/35">
@@ -124,7 +118,6 @@ export function TotalServicePayment({
           )}
         </div>
 
-        {/* CHÂN VÉ: tổng tiền + nút thanh toán */}
         <div className="border-t border-white/[.08] px-6 pb-6 pt-4">
           <div className="flex items-baseline justify-between">
             <span className="text-xs uppercase tracking-[0.25em] text-white/45">

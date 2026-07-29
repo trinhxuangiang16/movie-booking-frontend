@@ -45,15 +45,8 @@ const buttonVariants = cva(
   },
 );
 
-/*
-  Các variant "cinema" gom từ những button vát góc rải rác trong app
-  (Banner, Extraservices, Paymentmodal, Seat, Totalservicepayment).
-  Nhóm này KHÔNG dùng base của shadcn ở trên — mỗi variant là chuỗi class
-  đầy đủ, giữ nguyên 100% UI gốc. Button 2 trạng thái (active/disabled)
-  tách thành 2 variant, component cha tự chọn theo state.
-*/
+
 const cinemaButtonVariants = {
-  /* Banner.tsx */
   bannerCta:
     "group relative overflow-hidden bg-white px-9 py-4 text-xs font-bold uppercase tracking-[0.18em] text-black transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] hover:tracking-[0.28em]",
   bannerRating:
@@ -65,11 +58,9 @@ const cinemaButtonVariants = {
   bannerTrailerActive:
     "group grid h-12 w-12 place-items-center transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] bg-gradient-to-r from-[#63eaff] to-[#ff88e1] text-black shadow-[0_0_34px_-6px_rgba(192,132,252,.8)]",
 
-  /* MovieCardList.tsx — CTA trong hover panel của card phim */
   cardCta:
     "group relative inline-flex items-center overflow-hidden bg-gradient-to-r from-[#63eaff] to-[#ff88e1] px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#06101c] transition-all [clip-path:polygon(7px_0,100%_0,100%_calc(100%-7px),calc(100%-7px)_100%,0_100%,0_7px)] hover:shadow-[0_8px_24px_-6px_rgba(192,132,252,.7)] hover:tracking-[0.24em]",
 
-  /* Extraservices.tsx — stepper +/− */
   stepperMinus:
     "grid h-8 w-8 place-items-center border text-lg leading-none transition-all [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)] border-white/25 text-white/80 hover:border-[#ff88e1]/60 hover:text-[#ff88e1]",
   stepperMinusDisabled:
@@ -77,7 +68,6 @@ const cinemaButtonVariants = {
   stepperPlus:
     "grid h-8 w-8 place-items-center border text-lg leading-none transition-all [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)] border-white/25 text-white/80 hover:border-[#63eaff]/60 hover:text-[#7fefff] hover:shadow-[0_0_10px_-2px_rgba(99,234,255,.5)]",
 
-  /* Paymentmodal.tsx */
   modalClose:
     "grid h-8 w-8 place-items-center border border-white/15 text-white/60 transition hover:border-[#ff88e1]/60 hover:text-[#ff88e1] [clip-path:polygon(5px_0,100%_0,100%_calc(100%-5px),calc(100%-5px)_100%,0_100%,0_5px)]",
   payMethod:
@@ -89,14 +79,12 @@ const cinemaButtonVariants = {
   payDismiss:
     "flex-1 border border-white/15 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white/60 transition hover:border-white/35 hover:text-white [clip-path:polygon(8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%,0_8px)]",
 
-  /* Nút thanh toán gradient (Paymentmodal xác nhận + Totalservicepayment).
-     Margin (mt-5/mt-6) truyền qua className ở nơi dùng. */
+
   payment:
     "group relative w-full overflow-hidden py-3.5 text-sm font-bold uppercase tracking-[0.22em] transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] bg-gradient-to-r from-[#63eaff] to-[#ff88e1] text-[#06101c] hover:shadow-[0_10px_34px_-8px_rgba(192,132,252,.7)]",
   paymentDisabled:
     "group relative w-full overflow-hidden py-3.5 text-sm font-bold uppercase tracking-[0.22em] transition-all [clip-path:polygon(9px_0,100%_0,100%_calc(100%-9px),calc(100%-9px)_100%,0_100%,0_9px)] cursor-not-allowed bg-white/[.06] text-white/25",
 
-  /* Seat.tsx — mỗi trạng thái ghế 1 variant */
   seatBooked:
     "relative flex h-8 w-8 items-center justify-center text-[10px] font-semibold tracking-wide transition-all duration-200 [clip-path:polygon(5px_0,100%_0,100%_calc(100%-5px),calc(100%-5px)_100%,0_100%,0_5px)] bg-white/[.04] text-white/20 border border-white/[.06] cursor-not-allowed",
   seatSelected:

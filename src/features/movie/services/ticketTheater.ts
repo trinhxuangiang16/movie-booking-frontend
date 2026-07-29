@@ -6,6 +6,9 @@ export interface ISeatStatus {
   loai_ghe: string;
   da_dat: boolean;
   dang_giu_cho: boolean;
+  loai_giu_cho: "tam" | "da_tao_don" | null;
+  la_cua_toi: boolean;
+  giu_den: string | null;
 }
 
 export interface ITheaterSeatStatus {

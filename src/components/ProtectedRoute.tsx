@@ -7,29 +7,24 @@ import { getCookie } from "cookies-next";
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+  const [token, setToken] = useState<string | undefined>(undefined);
 
   const publicRoutes = ["/login", "/register"];
   const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
 
   useEffect(() => {
-    if (isPublic) {
-      setIsAuthorized(true);
-      setIsLoading(false);
-      return;
-    }
+    setIsMounted(true);
+    setToken(getCookie("accessToken") as string | undefined);
+  }, [pathname]);
 
-    const token = getCookie("accessToken");
-    if (!token) {
+  useEffect(() => {
+    if (isMounted && !isPublic && !token) {
       router.push("/login");
-    } else {
-      setIsAuthorized(true);
     }
-    setIsLoading(false);
-  }, [router, pathname, isPublic]);
+  }, [router, isMounted, pathname, isPublic, token]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!isAuthorized) return null;
+  if (!isMounted) return null;
+  if (!isPublic && !token) return null;
   return <>{children}</>;
 }

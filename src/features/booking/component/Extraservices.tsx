@@ -4,16 +4,9 @@ import { CupSoda, Popcorn, ShoppingBasket, Sandwich } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ICombo } from "../services/combo";
 
-/*
-  Dịch vụ kèm theo: các dòng combo kiểu vé,
-  stepper vát góc, accent cyan khi có số lượng.
-  Danh sách combo lấy từ API (GET Combo/DanhSachCombo), truyền qua prop.
-*/
 
-// Pool icon lucide-react gán xoay vòng theo thứ tự combo (DB chưa có icon riêng)
 const COMBO_ICONS = [CupSoda, Popcorn, ShoppingBasket, Sandwich];
 
-// Màu nóng riêng cho icon từng combo — border/text/glow khi active
 const ICON_HOT_COLORS = [
   { border: "border-[#ff8a4c]/50", text: "text-[#ffab73]", glow: "rgba(255,138,76,.5)" }, // cam
   { border: "border-[#ffb020]/50", text: "text-[#ffc857]", glow: "rgba(255,176,32,.5)" }, // vàng hổ phách
@@ -53,17 +46,14 @@ export function ExtraServices({
         return (
           <div
             key={sv.ma_combo}
-            className={`flex items-center gap-5 py-5 transition-colors duration-300 ${
-              idx > 0 ? "border-t border-white/[.07]" : ""
-            } ${active ? "bg-[#ff8a4c]/[.03]" : ""}`}
+            className={`flex items-center gap-5 py-5 transition-colors duration-300 ${idx > 0 ? "border-t border-white/[.07]" : ""
+              } ${active ? "bg-[#ff8a4c]/[.03]" : ""}`}
           >
-            {/* icon nét mảnh, màu nóng */}
             <div
-              className={`grid h-12 w-12 shrink-0 place-items-center border transition-all duration-300 ${CUT} ${
-                active
-                  ? `${hot.border} ${hot.text}`
-                  : "border-white/12 text-white/45"
-              }`}
+              className={`grid h-12 w-12 shrink-0 place-items-center border transition-all duration-300 ${CUT} ${active
+                ? `${hot.border} ${hot.text}`
+                : "border-white/12 text-white/45"
+                }`}
               style={active ? { boxShadow: `0 0 14px -4px ${hot.glow}` } : undefined}
             >
               <Icon className="h-6 w-6" strokeWidth={1.5} />
@@ -73,9 +63,8 @@ export function ExtraServices({
               <div className="flex items-baseline gap-3">
                 <h4 className="font-bold text-white">{sv.ten_combo}</h4>
                 <span
-                  className={`text-sm font-semibold tracking-wide transition-colors ${
-                    active ? "text-[#7fefff]" : "text-white/50"
-                  }`}
+                  className={`text-sm font-semibold tracking-wide transition-colors ${active ? "text-[#7fefff]" : "text-white/50"
+                    }`}
                 >
                   {sv.gia.toLocaleString("vi-VN")}đ
                 </span>
@@ -85,7 +74,6 @@ export function ExtraServices({
               </p>
             </div>
 
-            {/* stepper */}
             <div className="flex shrink-0 items-center gap-3">
               <Button
                 type="button"
@@ -97,9 +85,8 @@ export function ExtraServices({
                 −
               </Button>
               <span
-                className={`w-6 text-center text-base font-bold tabular-nums ${
-                  active ? "text-[#7fefff]" : "text-white/40"
-                }`}
+                className={`w-6 text-center text-base font-bold tabular-nums ${active ? "text-[#7fefff]" : "text-white/40"
+                  }`}
               >
                 {qty}
               </span>

@@ -3,10 +3,7 @@
 import type { Seat as TSeat } from "../types/typeSeat";
 import { Seat } from "./Seat";
 
-/*
-  SeatMap dạng controlled: state ghế + dữ liệu ghế do trang booking giữ,
-  để panel thanh toán bên phải cùng đọc chung.
-*/
+
 
 type SeatMapProps = {
   seatMap: Record<string, TSeat[]>;
@@ -31,17 +28,15 @@ const CUT_SM =
 export function SeatMap({ seatMap, selectedSeats, onToggleSeat }: SeatMapProps) {
   return (
     <div className="flex flex-col gap-8">
-      {/* MÀN HÌNH: vòng cung phát sáng */}
+
       <div className="relative mx-auto w-full max-w-xl">
         <div className="h-10 w-full rounded-[100%_100%_0_0/200%_200%_0_0] border-t-2 border-[#63eaff]/70 shadow-[0_-14px_44px_-8px_rgba(99,234,255,.4)]" />
         <p className="absolute inset-x-0 top-3 text-center text-[10px] font-bold uppercase tracking-[0.5em] text-white/45">
           Màn hình
         </p>
-        {/* ánh sáng toả từ màn hình xuống ghế */}
         <div className="pointer-events-none absolute inset-x-8 top-6 h-24 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(99,234,255,.08),transparent_75%)]" />
       </div>
 
-      {/* GRID GHẾ */}
       <div className="flex flex-col items-center gap-2.5">
         {Object.entries(seatMap).map(([row, seats]) => (
           <div key={row} className="flex items-center gap-1.5">
@@ -66,7 +61,6 @@ export function SeatMap({ seatMap, selectedSeats, onToggleSeat }: SeatMapProps) 
         ))}
       </div>
 
-      {/* LEGEND */}
       <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 border-t border-white/[.07] pt-6">
         {LEGEND.map((l) => (
           <div key={l.label} className="flex items-center gap-2.5">

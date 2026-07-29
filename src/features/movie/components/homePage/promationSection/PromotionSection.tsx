@@ -9,27 +9,22 @@ import {
 import TitleSection from "../cateroryCardList/TitleSection";
 import { TMovie } from "@/features/movie/types/typeMovie";
 
-/*
-  Thẻ ưu đãi kiểu "vé mời" (invitation ticket):
-  - Không dùng ảnh stock — nền gradient ink + hoạ tiết riêng từng loại vẽ bằng CSS
-  - Vát góc clip-path đồng bộ toàn trang, cuống vé bên trái có mã loại xoay dọc
-  - Icon SVG mảnh tự vẽ, không dùng icon pack tròn đại trà
-*/
+
 
 const promotionTypeConfig: Record<
   TPromotionType,
   {
     label: string;
     code: string;
-    accent: string; // màu chủ đạo của loại
+    accent: string;
     icon: React.ReactNode;
-    pattern: string; // hoạ tiết nền CSS riêng
+    pattern: string;
   }
 > = {
   giam_gia: {
     label: "Giảm giá",
     code: "SALE",
-    accent: "#e8c46a", // gold — đồng bộ 3 card
+    accent: "#e8c46a",
 
     icon: (
       <svg
@@ -48,7 +43,7 @@ const promotionTypeConfig: Record<
   qua_tang: {
     label: "Quà tặng",
     code: "GIFT",
-    accent: "#e8c46a", // gold — đồng bộ 3 card
+    accent: "#e8c46a",
 
     icon: (
       <svg
@@ -67,7 +62,7 @@ const promotionTypeConfig: Record<
   thanh_vien: {
     label: "Thành viên",
     code: "VIP",
-    accent: "#e8c46a", // gold — đồng bộ 3 card
+    accent: "#e8c46a",
 
     icon: (
       <svg
@@ -84,7 +79,7 @@ const promotionTypeConfig: Record<
   },
 };
 
-export default function PromotionSection({}) {
+export default function PromotionSection({ }) {
   const { data: promotions = [] as TPromotion[] } = usePromotions();
 
   if (promotions.length === 0) return null;
@@ -102,20 +97,17 @@ export default function PromotionSection({}) {
                   key={promo.ma_khuyen_mai}
                   className="group relative h-[240px] cursor-pointer overflow-hidden [clip-path:polygon(14px_0,100%_0,100%_calc(100%-14px),calc(100%-14px)_100%,0_100%,0_14px)]"
                 >
-                  {/* ảnh nền giữ nguyên độ sáng, không phủ tối */}
+
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                     style={{ backgroundImage: `url(${promo.hinh_anh})` }}
                   />
-                  {/* hoạ tiết sọc / chấm riêng từng loại phủ lên trên ảnh */}
                   <div
                     className="absolute inset-0 opacity-80 transition-opacity duration-500 group-hover:opacity-100"
                     style={{ backgroundImage: config.pattern }}
                   />
-                  {/* scrim: dải tối mờ dần từ đáy lên để chữ metallic nổi, phần trên ảnh vẫn sáng */}
                   <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-[#070a1c] via-[#070a1c]/80 to-transparent" />
 
-                  {/* chỉ mạ kim loại mảnh ở cạnh đáy: đỏ hồng tan vào vàng, hai đầu mờ dần */}
                   <div
                     className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] shadow-[0_-1px_6px_rgba(232,196,106,.18)]"
                     style={{
@@ -124,7 +116,6 @@ export default function PromotionSection({}) {
                     }}
                   />
 
-                  {/* viền mảnh: trắng mờ, hover chuyển màu accent */}
                   <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 transition-all duration-500 group-hover:ring-white/0" />
                   <div
                     className="pointer-events-none absolute inset-0 opacity-0 ring-1 ring-inset transition-opacity duration-500 group-hover:opacity-100"
@@ -133,7 +124,6 @@ export default function PromotionSection({}) {
                     }}
                   />
 
-                  {/* CUỐNG VÉ trái: đường đục lỗ + mã loại xoay dọc */}
                   <div className="absolute inset-y-0 left-0 flex w-12 items-center justify-center">
                     <span
                       className="absolute inset-y-3 right-0 w-px"
@@ -153,7 +143,6 @@ export default function PromotionSection({}) {
                     </span>
                   </div>
 
-                  {/* icon nét mảnh, lớn, mờ ở góc trên phải như watermark */}
                   <div
                     className="absolute right-5 top-5 h-14 w-14 opacity-90 transition-all duration-500 group-hover:opacity-100 group-hover:-translate-y-0.5"
                     style={{
@@ -164,7 +153,6 @@ export default function PromotionSection({}) {
                     {config.icon}
                   </div>
 
-                  {/* nội dung */}
                   <div className="relative z-10 flex h-full flex-col justify-end py-6 pl-16 pr-6">
                     <p
                       className="text-[10px] font-bold uppercase tracking-[0.35em]"
@@ -191,7 +179,6 @@ export default function PromotionSection({}) {
                             {promo.han_su_dung}
                           </span>
                         </p>
-                        {/* mũi tên trượt vào khi hover */}
                         <span
                           className="-translate-x-2 text-lg opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
                           style={{ color: config.accent }}
@@ -202,7 +189,6 @@ export default function PromotionSection({}) {
                     )}
                   </div>
 
-                  {/* ánh sáng lướt qua khi hover */}
                   <span className="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(105deg,transparent_42%,rgba(255,255,255,.08)_50%,transparent_58%)] transition-transform duration-1000 group-hover:translate-x-full" />
                 </article>
               );
