@@ -77,9 +77,9 @@ export default function AccountDetail() {
         toast.success("Cập nhật thông tin tài khoản thành công!");
         setIsEditing(false);
       },
-      onError: (err: any) => {
+      onError: (err) => {
         const errorMsg =
-          err?.response?.data?.message || "Cập nhật thông tin thất bại!";
+          (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Cập nhật thông tin thất bại!";
         toast.error(errorMsg);
       },
     });
