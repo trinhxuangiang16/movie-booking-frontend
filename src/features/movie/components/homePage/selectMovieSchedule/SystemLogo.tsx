@@ -224,7 +224,7 @@ export function SystemLogo() {
                 onClick={() => {
                   setSelectedLichChieu(item.ma_lich_chieu);
                   router.push(
-                    `/booking-test?ma_lich_chieu=${item.ma_lich_chieu}`,
+                    `/booking?ma_lich_chieu=${item.ma_lich_chieu}`,
                   );
                 }}
               >
