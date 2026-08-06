@@ -6,6 +6,8 @@ A modern movie ticket booking web application built with Next.js, React, TypeScr
 
 URL: https://movie.trinhxuangiang.me
 
+![Application Demo](./public/demo.gif)
+
 ## Test Credentials
 
 Regular User 1:
@@ -51,6 +53,13 @@ Admin Account:
 ### 6. Booking History
 - Comprehensive order history viewing past and upcoming bookings with ticket status.
 
+## Engineering Highlights
+
+- Automatic Token Silent Refresh: Implemented custom Axios interceptors handling transparent 401 token refresh queue management using cookies-next.
+- Dynamic Data Caching: Leveraged TanStack React Query v5 for server-state caching, background revalidation, and optimistic UI updates during seat holding.
+- Form Validation Architecture: Built type-safe forms with React Hook Form integrated with Zod validation schemas (@hookform/resolvers).
+- Digital Ticket Rendering: Client-side QR Code rendering (qrcode.react) paired with html-to-image DOM screenshot capabilities for saving mobile tickets.
+
 ## Tech Stack
 
 - Framework: Next.js 16 (App Router), React 19
@@ -84,3 +93,9 @@ Steps:
 - npm run build: Build application for production
 - npm run start: Start production server
 - npm run lint: Run ESLint checks
+
+## Author
+
+- Name: Trinh Xuan Giang
+- Email: trinhgiang.dev16@gmail.com
+- GitHub: https://github.com/trinhxuangiang16
