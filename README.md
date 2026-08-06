@@ -62,7 +62,7 @@ Admin Account:
 
 ## Tech Stack
 
-- Framework: Next.js 16 (App Router), React 19
+- Framework: Next.js 16 (App Router)
 - Language: TypeScript
 - Styling: Tailwind CSS v4, Shadcn UI, Radix UI
 - State & Data Fetching: TanStack React Query v5, Axios
